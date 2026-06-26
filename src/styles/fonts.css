@@ -1,0 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@300;400;500;700&family=Plus+Jakarta+Sans:wght@400;500;700&family=Inter:wght@400;500;600;700;800&family=Manrope:wght@400;500;700&family=PT+Serif&family=Rethink+Sans:wght@400;500;600;700;800&family=Archivo:wght@500&family=Bowlby+One&display=swap');
+
+@font-face {
+  font-family: 'HighriseDemo';
+  src: local('Bowlby One'), local('Bowlby One SC');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class*="HighriseDemo"] {
+  text-transform: uppercase;
+}
