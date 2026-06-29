@@ -21,23 +21,33 @@ const TEMPLATES = [
 ];
 
 /* Where the campaign tool / login lives, and the key both sides agree on. */
-const CREATIVE_URL = "https://creative.juicelabs.ai/";
+const CREATIVE_URL = "https://juice-creativity--main-agentic-2uxjvhim.web.app";
 const HANDOFF_KEY = "juice_prompt";
+
+/* Cap the prompt so it fits the cookie transport. Browsers silently drop any
+   single cookie over ~4KB (name + value + attributes) — and that's the channel
+   that survives the OAuth redirect, so losing it loses the prompt. 1500 chars
+   stays well under 4KB even after URL-encoding, and is plenty for a brief. */
+const MAX_PROMPT = 1500;
 
 /* Hand the typed prompt off to the tool across the subdomain + login boundary.
    We write it two ways so it survives an OAuth redirect that may strip the URL:
    (1) a cookie scoped to the shared parent domain `.juicelabs.ai`, and
    (2) a query param on the redirect URL. The tool reads either after sign-in. */
 function handoffToTool(prompt: string) {
+  /* Defensive clamp — the textarea already enforces MAX_PROMPT, but never let
+     an over-long value blow past the cookie / URL limits if called directly. */
+  const value = encodeURIComponent(prompt.slice(0, MAX_PROMPT));
   try {
     const secure = window.location.protocol === "https:" ? "; Secure" : "";
     document.cookie =
-      `${HANDOFF_KEY}=${encodeURIComponent(prompt)}` +
+      `${HANDOFF_KEY}=${value}` +
       `; domain=.juicelabs.ai; path=/; max-age=1800; SameSite=Lax${secure}`;
   } catch {
-    /* domain cookie is rejected off *.juicelabs.ai (e.g. localhost) — query param still carries it */
+    /* domain cookie is rejected off *.juicelabs.ai (e.g. localhost dev) — the
+       query param below is the working channel there and after OAuth strips it */
   }
-  window.location.href = `${CREATIVE_URL}?${HANDOFF_KEY}=${encodeURIComponent(prompt)}`;
+  window.location.href = `${CREATIVE_URL}?${HANDOFF_KEY}=${value}`;
 }
 
 /* ---- Animation #3: real campaign input with focus ring + submit state ---- */
@@ -46,10 +56,14 @@ function CampaignInput() {
   const [sent, setSent] = useState(false);
 
   const submit = () => {
+    if (sent) return; // already redirecting — ignore repeat clicks / Enter
     const prompt = value.trim();
     if (!prompt) return;
     setSent(true);
     handoffToTool(prompt);
+    /* The redirect normally unloads this page before this fires. It only runs
+       if navigation is blocked/slow, so the user isn't stranded in "sent". */
+    window.setTimeout(() => setSent(false), 8000);
   };
 
   return (
@@ -64,11 +78,14 @@ function CampaignInput() {
           }
         }}
         rows={1}
+        maxLength={MAX_PROMPT}
+        disabled={sent}
         aria-label="Describe your campaign"
         placeholder="Create a campaign for Betty Crocker’s new product line"
-        className="block w-full resize-none border-0 bg-transparent font-display text-[16px] text-[#333] outline-none placeholder:text-neutral-400 sm:text-[18px]"
+        className="block w-full resize-none border-0 bg-transparent font-display text-[16px] text-[#333] outline-none placeholder:text-neutral-400 disabled:cursor-wait disabled:opacity-60 sm:text-[18px]"
       />
-      <div className="mt-8 flex items-center justify-between gap-3">
+      <div className="mt-8 flex items-center justify-end gap-3">
+        {/* Hidden for now — attach button
         <button
           type="button"
           aria-label="Attach"
@@ -76,7 +93,9 @@ function CampaignInput() {
         >
           <PlusIcon />
         </button>
+        */}
         <div className="flex items-center gap-2.5">
+          {/* Hidden for now — Select a Brand dropdown
           <button
             type="button"
             className="flex h-8 items-center gap-1.5 rounded-[10px] border border-[#e8e8e8] px-3 font-display text-[14px] font-medium text-[#333] transition hover:bg-neutral-50"
@@ -84,6 +103,7 @@ function CampaignInput() {
             Select a Brand
             <ChevronIcon />
           </button>
+          */}
           <button
             type="button"
             aria-label="Voice"
@@ -94,7 +114,8 @@ function CampaignInput() {
           <button
             type="button"
             onClick={submit}
-            aria-label={sent ? "Sent" : "Send"}
+            disabled={sent}
+            aria-label={sent ? "Redirecting…" : "Send"}
             className={`grid size-8 shrink-0 place-items-center rounded-full text-white transition ${
               sent ? "bg-green-600" : "bg-[#333] hover:scale-105"
             }`}
