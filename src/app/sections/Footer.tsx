@@ -3,14 +3,18 @@ import can from "../../imports/5Jun/can.png";
 
 const BUTTONS = ["Join the Waitlist", "About us", "Get a Demo"];
 
-export default function Footer() {
+export default function Footer({ lowCan = false }: { lowCan?: boolean }) {
   return (
     <footer id="waitlist" className="relative bg-white">
-      {/* COLD PRESSED CLARITY can — far right, overlaps up into the Jam section */}
+      {/* COLD PRESSED CLARITY can — far right. By default it overlaps up into the
+          section above; `lowCan` keeps it tucked at the footer corner for pages
+          whose preceding section has content near its bottom edge. */}
       <img
         src={can}
         alt="Juice — Cold Pressed Clarity can"
-        className="pointer-events-none absolute right-[2%] -top-[clamp(180px,25vw,440px)] z-20 w-[clamp(210px,28vw,440px)] rotate-[13deg] select-none lg:right-[4%]"
+        className={`pointer-events-none absolute right-[2%] z-20 w-[clamp(210px,28vw,440px)] rotate-[13deg] select-none lg:right-[4%] ${
+          lowCan ? "-top-[clamp(60px,7vw,150px)]" : "-top-[clamp(180px,25vw,440px)]"
+        }`}
         draggable={false}
       />
 
