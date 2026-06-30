@@ -4,3 +4,7 @@ dist
 *.log
 
 .claude
+
+.env
+discount-codes.xlsx
+discount-codes.json
