@@ -1,8 +1,8 @@
 import { motion } from "motion/react";
 import { fadeUp, staggerParent, revealViewport } from "../lib/motion";
-import onbrand1 from "../../imports/5Jun/creatives/onbrand-1.png";
-import onbrand2 from "../../imports/5Jun/creatives/onbrand-2.png";
-import onbrand3 from "../../imports/5Jun/creatives/onbrand-3.png";
+import onbrand1 from "../../imports/5Jun/creatives/onbrand-1.webp";
+import onbrand2 from "../../imports/5Jun/creatives/onbrand-2.webp";
+import onbrand3 from "../../imports/5Jun/creatives/onbrand-3.webp";
 
 const CARDS = [
   // image 1 is square — fill the width (no side gaps) and crop only from the bottom
