@@ -18,7 +18,6 @@ type Lead = {
   status: string;
 };
 
-const PASS_KEY = "juice_admin_pass";
 const STATUSES = ["New", "Reached Out", "Demo Set", "Closed"] as const;
 const STATUS_STYLE: Record<string, { pill: string; dot: string }> = {
   New: { pill: "bg-[#eef1ff] text-[#4055c9]", dot: "bg-[#4055c9]" },
@@ -243,18 +242,11 @@ export default function AdminLeads() {
     }
     setLeads((data ?? []) as Lead[]);
     setAuthed(true);
-    sessionStorage.setItem(PASS_KEY, password);
     return true;
   };
 
-  useEffect(() => {
-    const saved = sessionStorage.getItem(PASS_KEY);
-    if (saved) {
-      setPass(saved);
-      fetchLeads(saved);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // Auth is intentionally kept in memory only — the password gate reappears on
+  // every page reload (no sessionStorage / localStorage persistence).
 
   const setStatus = async (id: string, status: string) => {
     const prev = leads;
@@ -351,7 +343,6 @@ export default function AdminLeads() {
   };
 
   const logout = () => {
-    sessionStorage.removeItem(PASS_KEY);
     setAuthed(false);
     setPass("");
     setLeads([]);
