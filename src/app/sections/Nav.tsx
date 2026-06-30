@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Link, useLocation } from "react-router";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Logo from "./Logo";
 import { SolutionsMenu, ComingSoonMenu } from "./NavMenus";
@@ -28,10 +29,20 @@ function Caret({ open }: { open?: boolean }) {
 }
 
 function Wordmark() {
+  const { pathname } = useLocation();
+  // On the home page keep the smooth scroll-to-top; on every other route the
+  // logo navigates back to the homepage.
+  if (pathname === "/") {
+    return (
+      <a href="#top" className="block select-none" aria-label="Juice home">
+        <Logo className="h-[50px] w-auto" />
+      </a>
+    );
+  }
   return (
-    <a href="#top" className="block select-none" aria-label="Juice home">
+    <Link to="/" className="block select-none" aria-label="Juice home">
       <Logo className="h-[50px] w-auto" />
-    </a>
+    </Link>
   );
 }
 

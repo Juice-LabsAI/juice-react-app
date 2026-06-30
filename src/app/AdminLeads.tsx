@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { Link } from "react-router";
 import Logo from "./sections/Logo";
 import CountrySelect, { dialForIso, isoForDial } from "./components/CountrySelect";
 import { supabase } from "../lib/supabase";
@@ -392,7 +393,9 @@ export default function AdminLeads() {
     <div className="min-h-screen bg-[#faf9ff]">
       <header className="sticky top-0 z-20 flex flex-wrap items-center justify-between gap-3 border-b border-black/5 bg-white/90 px-5 py-4 backdrop-blur sm:px-8">
         <div className="flex items-center gap-3">
-          <Logo className="h-7 w-auto" />
+          <Link to="/" aria-label="Juice home" className="block select-none">
+            <Logo className="h-7 w-auto" />
+          </Link>
           <span className="font-body text-lg font-extrabold text-[#444]">Leads</span>
           <span className="rounded-full bg-[#f0ecff] px-2.5 py-0.5 font-display text-[13px] font-medium text-[#7c54d6]">
             {rows.length}
