@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { fadeUp, revealViewport } from "../lib/motion";
+import { CREATIVE_URL } from "../lib/config";
 import bettyAnti from "../../imports/5Jun/templates/betty-anti.png";
 import bettyMood from "../../imports/5Jun/templates/betty-mood.png";
 import bettyTuesday from "../../imports/5Jun/templates/betty-tuesday.png";
@@ -20,8 +21,8 @@ const TEMPLATES = [
   },
 ];
 
-/* Where the campaign tool / login lives, and the key both sides agree on. */
-const CREATIVE_URL = "https://juice-creativity--main-agentic-2uxjvhim.web.app";
+/* CREATIVE_URL is resolved per environment in ../lib/config.
+   HANDOFF_KEY is the key both sides agree on for the prompt. */
 const HANDOFF_KEY = "juice_prompt";
 
 /* Cap the prompt so it fits the cookie transport. Browsers silently drop any
@@ -37,17 +38,23 @@ const MAX_PROMPT = 1500;
 function handoffToTool(prompt: string) {
   /* Defensive clamp — the textarea already enforces MAX_PROMPT, but never let
      an over-long value blow past the cookie / URL limits if called directly. */
-  const value = encodeURIComponent(prompt.slice(0, MAX_PROMPT));
+  const clamped = prompt.slice(0, MAX_PROMPT);
+  const value = encodeURIComponent(clamped);
+  console.log("[handoff] prompt length:", clamped.length, "encoded length:", value.length);
   try {
     const secure = window.location.protocol === "https:" ? "; Secure" : "";
     document.cookie =
       `${HANDOFF_KEY}=${value}` +
       `; domain=.juicelabs.ai; path=/; max-age=1800; SameSite=Lax${secure}`;
-  } catch {
+    console.log("[handoff] cookie written to .juicelabs.ai");
+  } catch (err) {
     /* domain cookie is rejected off *.juicelabs.ai (e.g. localhost dev) — the
        query param below is the working channel there and after OAuth strips it */
+    console.warn("[handoff] cookie rejected, relying on query param:", err);
   }
-  window.location.href = `${CREATIVE_URL}?${HANDOFF_KEY}=${value}`;
+  const target = `${CREATIVE_URL}?${HANDOFF_KEY}=${value}`;
+  console.log("[handoff] redirecting to:", target);
+  window.location.href = target;
 }
 
 /* ---- Animation #3: real campaign input with focus ring + submit state ---- */
@@ -58,8 +65,13 @@ function CampaignInput() {
   const submit = () => {
     if (sent) return; // already redirecting — ignore repeat clicks / Enter
     const prompt = value.trim();
-    if (!prompt) return;
+    if (!prompt) {
+      console.log("[campaign] submit ignored — empty prompt");
+      return;
+    }
+    console.log("[campaign] submitting prompt:", prompt);
     setSent(true);
+    setValue(""); // clear the input now that the prompt has been captured
     handoffToTool(prompt);
     /* The redirect normally unloads this page before this fires. It only runs
        if navigation is blocked/slow, so the user isn't stranded in "sent". */
@@ -96,6 +108,7 @@ function CampaignInput() {
         */}
         <div className="flex items-center gap-2.5">
           {/* Hidden for now — Select a Brand dropdown
+          */}
           <button
             type="button"
             className="flex h-8 items-center gap-1.5 rounded-[10px] border border-[#e8e8e8] px-3 font-display text-[14px] font-medium text-[#333] transition hover:bg-neutral-50"
@@ -103,7 +116,6 @@ function CampaignInput() {
             Select a Brand
             <ChevronIcon />
           </button>
-          */}
           <button
             type="button"
             aria-label="Voice"
