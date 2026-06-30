@@ -6,6 +6,7 @@ const PARTS = [
     num: "1",
     title: "Brand OS",
     subtitle: "( AI Platform )",
+    descriptor: "Self Serve tool subscription for teams who like to DIY",
     items: ["Ad Campaigns", "Creator Campaigns", "Commerce Content", "Packaging Design", "Concept Generation"],
     engagement: "Self-Serve Platform Subscription",
   },
@@ -13,8 +14,9 @@ const PARTS = [
     num: "2",
     title: "AI Studio",
     subtitle: "( Human in the loop services )",
+    descriptor: "Agency model for clients who want us to operate the platform and just focus on the end product",
     items: ["End to End Campaign execution", "Production Ready Videos", "Image Editing / Correction", "Other Studio Services"],
-    engagement: "Retainer or Rate-card",
+    engagement: "Rate-card",
   },
 ];
 
@@ -38,8 +40,9 @@ function Part({ part }: { part: (typeof PARTS)[number] }) {
           {part.title}
         </h3>
         <p className="mt-3.5 font-display text-[clamp(1.25rem,2.4vw,2rem)] text-[#333]">{part.subtitle}</p>
+        <p className="mt-4 max-w-[440px] font-display text-base leading-relaxed text-[#666]">{part.descriptor}</p>
 
-        <ol className="mt-12 flex flex-col gap-4 font-display text-lg font-medium text-[#535353] sm:text-xl">
+        <ol className="mt-9 flex flex-col gap-4 font-display text-lg font-medium text-[#535353] sm:text-xl">
           {part.items.map((it, i) => (
             <li key={it} className="flex gap-3.5">
               <span>{i + 1}.</span>

@@ -6,18 +6,14 @@ import f3 from "../../imports/5Jun/features/f3.svg";
 import f4 from "../../imports/5Jun/features/f4.svg";
 import f5 from "../../imports/5Jun/features/f5.svg";
 import f6 from "../../imports/5Jun/features/f6.svg";
-import f7 from "../../imports/5Jun/features/f7.svg";
-import f8 from "../../imports/5Jun/features/f8.svg";
 
 const FEATURES = [
-  { icon: f1, title: "Anatomy of Effective ads", desc: "Fine-tuned on winning ads, stories, and persuasion patterns with 80+ signals per ad" },
-  { icon: f2, title: "Culture & Conversation radar", desc: "Maps real conversations, cultural signals, memes & surfaces fertile territories" },
-  { icon: f3, title: "Expert-in-the-loop Refinement", desc: "Models tuned with the taste, judgement and craft of experts who have won at Cannes, Effies and more" },
-  { icon: f4, title: "Playbook & Creative control", desc: "Comprehensive ingestion and analysis of your brand guidelines, voice, tone & expression" },
-  { icon: f5, title: "Continuous Learning Loop", desc: "Every idea is an experiment and every experiment makes the system smarter" },
-  { icon: f6, title: "Crafted for Creative Jams", desc: "Fine-tuned on winning ads, stories, and persuasion patterns with 80+ signals per ad" },
-  { icon: f7, title: "Brand Governance", desc: "Fine-tuned on winning ads, stories, and persuasion patterns with 80+ signals per ad" },
-  { icon: f8, title: "IP Safety Checks", desc: "Fine-tuned on winning ads, stories, and persuasion patterns with 80+ signals per ad" },
+  { icon: f1, title: "Signal-Driven Concepts", desc: "Ideas built from real cultural and category signal, engineered to cut through the noise before a dollar is spent." },
+  { icon: f2, title: "Creative Jamming", desc: "A shared space where teams create, craft, and riff on ideas together — not a one-shot generator." },
+  { icon: f3, title: "Brand Playbook & Governance", desc: "Ingests your brand guidelines, voice, and visual expression so every output stays unmistakably on-brand." },
+  { icon: f4, title: "Expert-in-the-Loop Refinement", desc: "Outputs shaped by the taste and judgment of creatives who’ve won at Cannes, Effies, and beyond." },
+  { icon: f5, title: "Full-Funnel Campaigns", desc: "Cohesive strategy from insight to big idea to channel-specific creative, all crafted around the objective." },
+  { icon: f6, title: "Creative Adaptation & Formats", desc: "Turn one concept into many — adapted across static, video, and every format your channels demand." },
 ];
 
 export default function Features() {
@@ -39,7 +35,7 @@ export default function Features() {
           initial="hidden"
           whileInView="show"
           viewport={revealViewport}
-          className="mt-12 grid grid-cols-2 gap-x-8 gap-y-12 sm:gap-x-10 lg:mt-[52px] lg:grid-cols-4"
+          className="mt-12 grid grid-cols-2 gap-x-8 gap-y-12 sm:gap-x-10 lg:mt-[52px] lg:grid-cols-3"
         >
           {FEATURES.map((f) => (
             <motion.div key={f.title} variants={fadeUp} className="flex max-w-[272px] flex-col gap-[22px]">

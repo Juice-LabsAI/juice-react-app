@@ -8,3 +8,6 @@ dist
 .env
 discount-codes.xlsx
 discount-codes.json
+
+# raw image drop folder — processed copies live in src/imports
+Website image assets/

@@ -1,13 +1,16 @@
 import { motion } from "motion/react";
 import { fadeUp, staggerParent, revealViewport } from "../lib/motion";
-import apple from "../../imports/5Jun/creatives/apple.png";
-import basket from "../../imports/5Jun/creatives/basket.png";
-import hands from "../../imports/5Jun/creatives/hands.png";
+import onbrand1 from "../../imports/5Jun/creatives/onbrand-1.png";
+import onbrand2 from "../../imports/5Jun/creatives/onbrand-2.png";
+import onbrand3 from "../../imports/5Jun/creatives/onbrand-3.png";
 
 const CARDS = [
-  { img: apple, label: "On Brand Creatives" },
-  { img: basket, label: "Pack and Logo Fidelity" },
-  { img: hands, label: "Creative Control" },
+  // image 1 is square — fill the width (no side gaps) and crop only from the bottom
+  { img: onbrand1, label: "On Brand Creatives", fit: "object-cover object-top" },
+  { img: onbrand2, label: "Pack and Logo Fidelity", fit: "object-cover" },
+  // image 3 is a wide UI shot — crop to just past the left sidebar so the creative
+  // preview (the "Fake 8 hours of sleep" frame) is fully visible, navbar hidden
+  { img: onbrand3, label: "Creative Control", fit: "object-cover object-[13%_center]" },
 ];
 
 export default function Creatives() {
@@ -39,7 +42,7 @@ export default function Creatives() {
                 <img
                   src={c.img}
                   alt={c.label}
-                  className="aspect-[437/375] w-full object-cover"
+                  className={`aspect-[437/375] w-full ${c.fit}`}
                   draggable={false}
                 />
               </div>
