@@ -11,7 +11,14 @@ if (!url || !anonKey) {
 }
 
 /* Public anon client. All sensitive access (redeeming codes, listing leads) goes
-   through SECURITY DEFINER RPCs, so the anon key never grants direct table access. */
-export const supabase = createClient(url ?? "", anonKey ?? "", {
-  auth: { persistSession: false },
-});
+   through SECURITY DEFINER RPCs, so the anon key never grants direct table access.
+
+   Fall back to a syntactically valid placeholder when the env isn't configured:
+   createClient() throws on an empty URL, which would white-screen the entire app
+   (incl. the marketing pages). With the placeholder the site still renders and only
+   the Supabase-backed calls fail — surfaced through the form's normal error states. */
+export const supabase = createClient(
+  url || "https://placeholder.supabase.co",
+  anonKey || "placeholder-anon-key",
+  { auth: { persistSession: false } },
+);
