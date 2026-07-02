@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import logo from "../imports/cmo/logo.svg";
+import logo from "../imports/juice-logo.png";
 import { supabase } from "../lib/supabase";
 
 /**

@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, useLocation } from "react-router";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import Logo from "./Logo";
 import { SolutionsMenu, ComingSoonMenu } from "./NavMenus";
+import juiceLogo from "../../imports/juice-logo.png";
 
 type NavLink = { label: string; href?: string; key?: string; menu?: ReactNode };
 
@@ -35,13 +35,13 @@ function Wordmark() {
   if (pathname === "/") {
     return (
       <a href="#top" className="block select-none" aria-label="Juice home">
-        <Logo className="h-[50px] w-auto" />
+        <img src={juiceLogo} alt="Juice" className="h-[50px] w-auto" draggable={false} />
       </a>
     );
   }
   return (
     <Link to="/" className="block select-none" aria-label="Juice home">
-      <Logo className="h-[50px] w-auto" />
+      <img src={juiceLogo} alt="Juice" className="h-[50px] w-auto" draggable={false} />
     </Link>
   );
 }
