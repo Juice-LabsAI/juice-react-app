@@ -1,7 +1,7 @@
 import Logo from "./Logo";
-import can from "../../imports/5Jun/can.png";
+import can from "../../imports/footer-can.png";
 
-const BUTTONS = ["Join the Waitlist", "About us", "Get a Demo"];
+const BUTTONS = ["Join the Waitlist", /* "About us" — commented out for now */ "Get a Demo"];
 
 export default function Footer({ lowCan = false }: { lowCan?: boolean }) {
   return (
@@ -13,7 +13,7 @@ export default function Footer({ lowCan = false }: { lowCan?: boolean }) {
         src={can}
         alt="Juice — Cold Pressed Clarity can"
         className={`pointer-events-none absolute right-[2%] z-20 w-[clamp(210px,28vw,440px)] rotate-[13deg] select-none lg:right-[4%] ${
-          lowCan ? "-top-[clamp(60px,7vw,150px)]" : "-top-[clamp(180px,25vw,440px)]"
+          lowCan ? "-top-[clamp(60px,7vw,150px)]" : "-top-[clamp(150px,21vw,380px)]"
         }`}
         draggable={false}
       />
@@ -51,8 +51,8 @@ export default function Footer({ lowCan = false }: { lowCan?: boolean }) {
             ))}
           </div>
           <div className="flex gap-8 font-display text-base text-white/80">
-            <a href="#" className="transition-colors hover:text-white">Privacy Policy</a>
-            <a href="#" className="transition-colors hover:text-white">Terms of Service</a>
+            <a href="https://www.juicelabs.ai/privacy-policy" target="_blank" rel="noreferrer" className="transition-colors hover:text-white">Privacy Policy</a>
+            <a href="https://www.juicelabs.ai/terms-conditions" target="_blank" rel="noreferrer" className="transition-colors hover:text-white">Terms of Service</a>
           </div>
           <div className="flex flex-col gap-1 font-display text-[13px] text-white/50 lg:items-end">
             <span>juicelabs.ai 2025 @ All Rights Reserved.</span>
