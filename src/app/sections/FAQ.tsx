@@ -5,24 +5,32 @@ import orange from "../../imports/5Jun/cefd9fc715838eba06f8eff66a58a5bb55b000d7.
 
 const FAQS = [
   {
-    q: "What can I create with Juice?",
-    a: "From ad campaigns and concepts to briefs, PDPs, content, brand strategies, creator campaigns, and consumer insights.",
+    q: "What types of ads can Juice make?",
+    a: "Performance ads, full-funnel campaigns, creator campaigns, and custom brand builds—across static and video, in the formats your channels need.",
   },
   {
-    q: "Do I need prompting experience?",
-    a: "From ad campaigns and concepts to briefs, PDPs, content, brand strategies, creator campaigns, and consumer insights.",
+    q: "Why is Juice better than Claude or ChatGPT?",
+    a: "General AI tools produce content, but they don’t know what makes an ad perform. Juice is trained specifically on high-performing ads, live signals, and real campaign results—so it starts from what works.",
   },
   {
-    q: "How long does it take to create my first campaign?",
-    a: "Proficiency in software such as Adobe Creative Suite, Figma, and project management tools.",
+    q: "Are the creatives on-brand?",
+    a: "Yes. Juice learns your brand’s voice, tone, and guidelines, so every idea reflects you rather than a generic template.",
   },
   {
-    q: "Can I upload my brand guidelines?",
-    a: "Essential for aligning visions with cross-functional teams and stakeholders.",
+    q: "How much creative control do I have?",
+    a: "Full control. You steer the direction, refine ideas, and jam with your team—Juice does the heavy lifting, but the output stays yours.",
   },
   {
-    q: "How does Juice learn my brand?",
-    a: "Experience in tech, fashion, or consumer goods can provide a competitive edge.",
+    q: "Is Juice suited for my brand’s scale?",
+    a: "Yes—from small teams and freelancers to mid-market and global enterprises. It flexes to how you work.",
+  },
+  {
+    q: "How does Juice know what will work?",
+    a: "It decodes the patterns behind winning ads across 80+ signals, reads live cultural and category trends, and folds in your brand guidelines before a single dollar is spent.",
+  },
+  {
+    q: "What makes it better than ad generators?",
+    a: "Ad generators churn out content that’s blind to performance. Juice figures out the idea first—what to make and why—then produces and optimizes it, so you’re not scaling a weak concept.",
   },
 ];
 

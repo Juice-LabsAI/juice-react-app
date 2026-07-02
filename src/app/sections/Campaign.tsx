@@ -86,9 +86,11 @@ export default function Campaign() {
               Juice campaign templates
             </h3>
             <div className="flex items-center gap-4 sm:gap-8">
+              {/* "Browse All" CTA — commented out (not removed).
               <button className="hidden rounded-full border border-white px-6 py-[15px] font-display text-base font-bold leading-none text-white transition hover:bg-white/10 sm:block">
                 Browse All
               </button>
+              */}
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => scrollBy(-1)}
