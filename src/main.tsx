@@ -6,6 +6,7 @@
   import QuickAds from "./app/QuickAds.tsx";
   import Redeem from "./app/Redeem.tsx";
   import AdminLeads from "./app/AdminLeads.tsx";
+  import CMOHandbook from "./app/CMOHandbook.tsx";
   import "./styles/index.css";
 
   createRoot(document.getElementById("root")!).render(
@@ -16,6 +17,7 @@
         <Route path="/quick-ads" element={<QuickAds />} />
         <Route path="/redeem" element={<Redeem />} />
         <Route path="/admin-leads" element={<AdminLeads />} />
+        <Route path="/CMO-Handbook" element={<CMOHandbook />} />
       </Routes>
     </BrowserRouter>,
   );

@@ -18,6 +18,35 @@ type Lead = {
   status: string;
 };
 
+type CmoLead = {
+  id: string;
+  created_at: string;
+  name: string;
+  phone: string;
+  email: string;
+  organization: string;
+  score: number | null;
+  archetype: string | null;
+  dimensions: Record<string, number> | null;
+  status: string;
+};
+
+// Canonical order for displaying the per-dimension scores (jsonb loses key order).
+const CMO_DIMENSIONS = [
+  "Organizational Readiness",
+  "Change Management",
+  "Brand Infrastructure",
+  "Creative Operations",
+  "Tech & Data",
+] as const;
+
+function dimensionEntries(d: Record<string, number> | null): { name: string; score: number }[] {
+  if (!d) return [];
+  return CMO_DIMENSIONS.filter((n) => d[n] != null).map((n) => ({ name: n, score: d[n] }));
+}
+
+type TabKey = "redeem" | "cmo";
+
 const STATUSES = ["New", "Reached Out", "Demo Set", "Closed"] as const;
 const STATUS_STYLE: Record<string, { pill: string; dot: string }> = {
   New: { pill: "bg-[#eef1ff] text-[#4055c9]", dot: "bg-[#4055c9]" },
@@ -32,6 +61,16 @@ const COLUMNS: { key: SortKey; label: string }[] = [
   { key: "name", label: "Name" },
   { key: "email", label: "Email" },
   { key: "organization", label: "Organization" },
+  { key: "created_at", label: "Date" },
+];
+
+type CmoSortKey = "created_at" | "name" | "email" | "organization" | "status" | "score";
+const CMO_COLUMNS: { key: CmoSortKey; label: string }[] = [
+  { key: "status", label: "Status" },
+  { key: "name", label: "Name" },
+  { key: "email", label: "Email" },
+  { key: "organization", label: "Organization" },
+  { key: "score", label: "Readiness" },
   { key: "created_at", label: "Date" },
 ];
 
@@ -112,7 +151,10 @@ function StatusSelect({ value, onChange }: { value: string; onChange: (s: string
   );
 }
 
-/* ---- add / edit modal ---- */
+const mInput =
+  "h-11 w-full rounded-xl border border-[#e4e0f0] bg-white px-3.5 font-display text-[14px] text-[#333] outline-none transition placeholder:text-neutral-400 focus:border-[#9165f5] focus:ring-2 focus:ring-[#9165f5]/30";
+
+/* ---- add / edit modal (Redeem leads) ---- */
 type LeadForm = {
   id?: string;
   first_name: string;
@@ -124,9 +166,6 @@ type LeadForm = {
   discount_code: string;
   status: string;
 };
-
-const mInput =
-  "h-11 w-full rounded-xl border border-[#e4e0f0] bg-white px-3.5 font-display text-[14px] text-[#333] outline-none transition placeholder:text-neutral-400 focus:border-[#9165f5] focus:ring-2 focus:ring-[#9165f5]/30";
 
 function LeadModal({
   initial,
@@ -217,37 +256,176 @@ function LeadModal({
   );
 }
 
+/* ---- add / edit modal (CMO Handbook leads) ---- */
+type CmoLeadForm = {
+  id?: string;
+  name: string;
+  phone: string;
+  email: string;
+  organization: string;
+  score: string;
+  archetype: string;
+  status: string;
+};
+
+function CmoLeadModal({
+  initial,
+  onClose,
+  onSave,
+}: {
+  initial: CmoLead | null;
+  onClose: () => void;
+  onSave: (f: CmoLeadForm) => Promise<string | null>;
+}) {
+  const [f, setF] = useState<CmoLeadForm>(() => ({
+    id: initial?.id,
+    name: initial?.name ?? "",
+    phone: initial?.phone ?? "",
+    email: initial?.email ?? "",
+    organization: initial?.organization ?? "",
+    score: initial?.score != null ? String(initial.score) : "",
+    archetype: initial?.archetype ?? "",
+    status: initial?.status ?? "New",
+  }));
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  const set = (k: keyof CmoLeadForm, v: string) => setF((p) => ({ ...p, [k]: v }));
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!f.name.trim() || !f.phone.trim() || !f.organization.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim())) {
+      setErr("Please fill in all required fields correctly.");
+      return;
+    }
+    setBusy(true);
+    const e2 = await onSave(f);
+    setBusy(false);
+    if (e2) setErr(e2);
+    else onClose();
+  };
+
+  return createPortal(
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/30 p-4" onMouseDown={onClose}>
+      <form
+        onMouseDown={(e) => e.stopPropagation()}
+        onSubmit={submit}
+        className="max-h-[90vh] w-full max-w-[520px] overflow-y-auto rounded-[20px] bg-white p-6 shadow-2xl sm:p-7"
+      >
+        <h2 className="font-body text-2xl font-extrabold text-[#444]">{initial ? "Edit lead" : "Add lead"}</h2>
+        <input className={`${mInput} mt-5`} placeholder="Full name *" value={f.name} onChange={(e) => set("name", e.target.value)} />
+        <input className={`${mInput} mt-4`} type="email" placeholder="Business email *" value={f.email} onChange={(e) => set("email", e.target.value)} />
+        <input className={`${mInput} mt-4`} placeholder="Contact number *" value={f.phone} onChange={(e) => set("phone", e.target.value.replace(/[^\d+\s-]/g, ""))} />
+        <input className={`${mInput} mt-4`} placeholder="Organization *" value={f.organization} onChange={(e) => set("organization", e.target.value)} />
+        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <input className={mInput} inputMode="numeric" placeholder="Readiness score (0–100)" value={f.score} onChange={(e) => set("score", e.target.value.replace(/[^\d]/g, "").slice(0, 3))} />
+          <input className={mInput} placeholder="Archetype (e.g. The Conductor)" value={f.archetype} onChange={(e) => set("archetype", e.target.value)} />
+        </div>
+        {dimensionEntries(initial?.dimensions ?? null).length > 0 && (
+          <div className="mt-5">
+            <span className="font-display text-[13px] font-medium text-[#555]">Dimension scores</span>
+            <div className="mt-2 grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+              {dimensionEntries(initial?.dimensions ?? null).map((e) => (
+                <div key={e.name} className="flex items-center justify-between rounded-lg bg-[#f6f4fc] px-3 py-2">
+                  <span className="font-display text-[13px] text-[#555]">{e.name}</span>
+                  <span className="font-display text-[13px] font-semibold text-[#333]">{e.score}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        <div className="mt-5">
+          <span className="font-display text-[13px] font-medium text-[#555]">Status</span>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {STATUSES.map((s) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => set("status", s)}
+                className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 font-display text-[13px] font-medium transition ${
+                  f.status === s ? STATUS_STYLE[s].pill + " ring-1 ring-current/30" : "bg-neutral-100 text-neutral-500"
+                }`}
+              >
+                <span className={`size-1.5 rounded-full ${f.status === s ? STATUS_STYLE[s].dot : "bg-neutral-400"}`} />
+                {s}
+              </button>
+            ))}
+          </div>
+        </div>
+        {err && <p className="mt-4 rounded-lg bg-[#fff0f0] px-3 py-2 font-display text-[13px] text-[#c0392b]">{err}</p>}
+        <div className="mt-6 flex justify-end gap-3">
+          <button type="button" onClick={onClose} className="h-11 rounded-full px-5 font-display text-[14px] font-medium text-[#777] transition hover:bg-neutral-100">
+            Cancel
+          </button>
+          <button type="submit" disabled={busy} className="h-11 rounded-full bg-[#333] px-6 font-display text-[14px] font-bold text-white transition hover:bg-[#222] disabled:opacity-60">
+            {busy ? "Saving…" : initial ? "Save changes" : "Add lead"}
+          </button>
+        </div>
+      </form>
+    </div>,
+    document.body,
+  );
+}
+
 export default function AdminLeads() {
   const [pass, setPass] = useState("");
   const [authed, setAuthed] = useState(false);
-  const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const [tab, setTab] = useState<TabKey>("redeem");
+
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [cmoLeads, setCmoLeads] = useState<CmoLead[]>([]);
 
   const [query, setQuery] = useState("");
   const [orgFilter, setOrgFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("created_at");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  const [cmoSortKey, setCmoSortKey] = useState<CmoSortKey>("created_at");
+  const [cmoSortDir, setCmoSortDir] = useState<"asc" | "desc">("desc");
   const [modal, setModal] = useState<{ open: boolean; lead: Lead | null }>({ open: false, lead: null });
-
-  const fetchLeads = async (password: string) => {
-    setLoading(true);
-    setError("");
-    const { data, error: err } = await supabase.rpc("admin_list_leads", { p_pass: password });
-    setLoading(false);
-    if (err) {
-      setError(/unauthor/i.test(err.message) ? "Incorrect password." : "Couldn’t load leads. Try again.");
-      return false;
-    }
-    setLeads((data ?? []) as Lead[]);
-    setAuthed(true);
-    return true;
-  };
+  const [cmoModal, setCmoModal] = useState<{ open: boolean; lead: CmoLead | null }>({ open: false, lead: null });
 
   // Auth is intentionally kept in memory only — the password gate reappears on
   // every page reload (no sessionStorage / localStorage persistence).
 
+  const fetchLeads = async (password: string) => {
+    const { data, error: err } = await supabase.rpc("admin_list_leads", { p_pass: password });
+    if (err) return err;
+    setLeads((data ?? []) as Lead[]);
+    return null;
+  };
+
+  const fetchCmoLeads = async (password: string) => {
+    const { data, error: err } = await supabase.rpc("admin_list_cmo_leads", { p_pass: password });
+    if (err) return err;
+    setCmoLeads((data ?? []) as CmoLead[]);
+    return null;
+  };
+
+  // Unlock: authenticate against the redeem list, then load both datasets.
+  const unlock = async (password: string) => {
+    setLoading(true);
+    setError("");
+    const err = await fetchLeads(password);
+    if (err) {
+      setLoading(false);
+      setError(/unauthor/i.test(err.message) ? "Incorrect password." : "Couldn’t load leads. Try again.");
+      return;
+    }
+    await fetchCmoLeads(password); // errors here surface on the CMO tab via its empty state
+    setLoading(false);
+    setAuthed(true);
+  };
+
+  const refresh = async () => {
+    setError("");
+    const err = tab === "redeem" ? await fetchLeads(pass) : await fetchCmoLeads(pass);
+    if (err) setError("Couldn’t refresh. Try again.");
+  };
+
+  /* ---- Redeem CRUD ---- */
   const setStatus = async (id: string, status: string) => {
     const prev = leads;
     setLeads((ls) => ls.map((l) => (l.id === id ? { ...l, status } : l))); // optimistic
@@ -290,11 +468,53 @@ export default function AdminLeads() {
     }
   };
 
-  const orgs = useMemo(() => Array.from(new Set(leads.map((l) => l.organization).filter(Boolean))).sort(), [leads]);
+  /* ---- CMO CRUD ---- */
+  const setCmoStatus = async (id: string, status: string) => {
+    const prev = cmoLeads;
+    setCmoLeads((ls) => ls.map((l) => (l.id === id ? { ...l, status } : l))); // optimistic
+    const { error: err } = await supabase.rpc("admin_set_cmo_status", { p_pass: pass, p_id: id, p_status: status });
+    if (err) {
+      setCmoLeads(prev);
+      setError("Couldn’t update status.");
+    }
+  };
 
+  const saveCmoLead = async (f: CmoLeadForm): Promise<string | null> => {
+    const args = {
+      p_pass: pass,
+      p_name: f.name,
+      p_phone: f.phone,
+      p_email: f.email,
+      p_organization: f.organization,
+      p_score: f.score.trim() === "" ? null : Number(f.score),
+      p_archetype: f.archetype,
+      p_status: f.status,
+    };
+    const { data, error: err } = f.id
+      ? await supabase.rpc("admin_update_cmo_lead", { ...args, p_id: f.id })
+      : await supabase.rpc("admin_create_cmo_lead", args);
+    if (err) return /unauthor/i.test(err.message) ? "Session expired — unlock again." : "Couldn’t save the lead.";
+    const row = data as CmoLead;
+    setCmoLeads((ls) => (f.id ? ls.map((l) => (l.id === row.id ? row : l)) : [row, ...ls]));
+    return null;
+  };
+
+  const deleteCmoLead = async (l: CmoLead) => {
+    if (!window.confirm(`Delete ${l.name}? This can’t be undone.`)) return;
+    const prev = cmoLeads;
+    setCmoLeads((ls) => ls.filter((x) => x.id !== l.id));
+    const { error: err } = await supabase.rpc("admin_delete_cmo_lead", { p_pass: pass, p_id: l.id });
+    if (err) {
+      setCmoLeads(prev);
+      setError("Couldn’t delete the lead.");
+    }
+  };
+
+  /* ---- derived: Redeem rows ---- */
+  const orgs = useMemo(() => Array.from(new Set(leads.map((l) => l.organization).filter(Boolean))).sort(), [leads]);
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase();
-    let out = leads.filter((l) => {
+    const out = leads.filter((l) => {
       if (orgFilter && l.organization !== orgFilter) return false;
       if (statusFilter && l.status !== statusFilter) return false;
       if (!q) return true;
@@ -309,14 +529,38 @@ export default function AdminLeads() {
         : sortKey === "created_at"
           ? l.created_at
           : String(l[sortKey] ?? "").toLowerCase();
-    out = [...out].sort((a, b) => {
+    return [...out].sort((a, b) => {
       const av = val(a);
       const bv = val(b);
       const cmp = av < bv ? -1 : av > bv ? 1 : 0;
       return sortDir === "asc" ? cmp : -cmp;
     });
-    return out;
   }, [leads, query, orgFilter, statusFilter, sortKey, sortDir]);
+
+  /* ---- derived: CMO rows ---- */
+  const cmoOrgs = useMemo(() => Array.from(new Set(cmoLeads.map((l) => l.organization).filter(Boolean))).sort(), [cmoLeads]);
+  const cmoRows = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const out = cmoLeads.filter((l) => {
+      if (orgFilter && l.organization !== orgFilter) return false;
+      if (statusFilter && l.status !== statusFilter) return false;
+      if (!q) return true;
+      return [l.name, l.email, l.organization, l.archetype ?? "", l.phone]
+        .join(" ")
+        .toLowerCase()
+        .includes(q);
+    });
+    return [...out].sort((a, b) => {
+      let cmp: number;
+      if (cmoSortKey === "score") cmp = (a.score ?? -1) - (b.score ?? -1);
+      else {
+        const av = cmoSortKey === "created_at" ? a.created_at : String(a[cmoSortKey] ?? "").toLowerCase();
+        const bv = cmoSortKey === "created_at" ? b.created_at : String(b[cmoSortKey] ?? "").toLowerCase();
+        cmp = av < bv ? -1 : av > bv ? 1 : 0;
+      }
+      return cmoSortDir === "asc" ? cmp : -cmp;
+    });
+  }, [cmoLeads, query, orgFilter, statusFilter, cmoSortKey, cmoSortDir]);
 
   const toggleSort = (key: SortKey) => {
     if (key === sortKey) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
@@ -325,19 +569,52 @@ export default function AdminLeads() {
       setSortDir(key === "created_at" ? "desc" : "asc");
     }
   };
+  const toggleCmoSort = (key: CmoSortKey) => {
+    if (key === cmoSortKey) setCmoSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    else {
+      setCmoSortKey(key);
+      setCmoSortDir(key === "created_at" || key === "score" ? "desc" : "asc");
+    }
+  };
+
+  const switchTab = (t: TabKey) => {
+    if (t === tab) return;
+    setTab(t);
+    setQuery("");
+    setOrgFilter("");
+    setStatusFilter("");
+    setError("");
+  };
+
+  const activeOrgs = tab === "redeem" ? orgs : cmoOrgs;
+  const activeCount = tab === "redeem" ? rows.length : cmoRows.length;
+  const activeTotal = tab === "redeem" ? leads.length : cmoLeads.length;
 
   const exportCsv = () => {
-    const head = ["Status", "First name", "Last name", "Phone", "Email", "Organization", "Code", "Date"];
-    const esc = (v: string) => `"${String(v ?? "").replace(/"/g, '""')}"`;
-    const body = rows.map((l) =>
-      [l.status, l.first_name, l.last_name, `${l.country_code} ${l.phone}`, l.email, l.organization, l.discount_code ?? "", fmtDate(l.created_at)]
-        .map(esc)
-        .join(","),
-    );
+    const esc = (v: string | number) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+    let head: string[];
+    let body: string[];
+    if (tab === "redeem") {
+      head = ["Status", "First name", "Last name", "Phone", "Email", "Organization", "Code", "Date"];
+      body = rows.map((l) =>
+        [l.status, l.first_name, l.last_name, `${l.country_code} ${l.phone}`, l.email, l.organization, l.discount_code ?? "", fmtDate(l.created_at)]
+          .map(esc)
+          .join(","),
+      );
+    } else {
+      head = ["Status", "Name", "Phone", "Email", "Organization", "Score", "Archetype", "Dimension scores", "Date"];
+      body = cmoRows.map((l) =>
+        [
+          l.status, l.name, l.phone, l.email, l.organization, l.score ?? "", l.archetype ?? "",
+          dimensionEntries(l.dimensions).map((e) => `${e.name} ${e.score}`).join("; "),
+          fmtDate(l.created_at),
+        ].map(esc).join(","),
+      );
+    }
     const blob = new Blob([[head.join(","), ...body].join("\n")], { type: "text/csv" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `juice-leads-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `juice-${tab}-leads-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(a.href);
   };
@@ -346,6 +623,7 @@ export default function AdminLeads() {
     setAuthed(false);
     setPass("");
     setLeads([]);
+    setCmoLeads([]);
   };
 
   /* ---- password gate ---- */
@@ -355,7 +633,7 @@ export default function AdminLeads() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            fetchLeads(pass);
+            unlock(pass);
           }}
           className="w-full max-w-[400px] rounded-[20px] bg-white p-8 shadow-[0_10px_40px_-12px_rgba(80,40,160,0.18)]"
         >
@@ -379,18 +657,24 @@ export default function AdminLeads() {
     );
   }
 
-  /* ---- leads table ---- */
+  const TABS: { key: TabKey; label: string; count: number }[] = [
+    { key: "redeem", label: "Redeem leads", count: leads.length },
+    { key: "cmo", label: "CMO Handbook leads", count: cmoLeads.length },
+  ];
+
+  /* ---- leads tables ---- */
   return (
     <div className="min-h-screen bg-[#faf9ff]">
-      <header className="sticky top-0 z-20 flex flex-wrap items-center justify-between gap-3 border-b border-black/5 bg-white/90 px-5 py-4 backdrop-blur sm:px-8">
+      <div className="sticky top-0 z-20 border-b border-black/5 bg-white/90 backdrop-blur">
+      <header className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 sm:px-8">
         <div className="flex items-center gap-3">
           <Link to="/" aria-label="Juice home" className="block select-none">
             <Logo className="h-7 w-auto" />
           </Link>
           <span className="font-body text-lg font-extrabold text-[#444]">Leads</span>
           <span className="rounded-full bg-[#f0ecff] px-2.5 py-0.5 font-display text-[13px] font-medium text-[#7c54d6]">
-            {rows.length}
-            {rows.length !== leads.length ? ` / ${leads.length}` : ""}
+            {activeCount}
+            {activeCount !== activeTotal ? ` / ${activeTotal}` : ""}
           </span>
         </div>
         <div className="flex flex-wrap items-center gap-2.5">
@@ -408,17 +692,20 @@ export default function AdminLeads() {
           </select>
           <select value={orgFilter} onChange={(e) => setOrgFilter(e.target.value)} className="h-10 max-w-[180px] rounded-full border border-[#e4e0f0] bg-white px-3 font-display text-[14px] text-[#333] outline-none focus:border-[#9165f5]">
             <option value="">All organizations</option>
-            {orgs.map((o) => (
+            {activeOrgs.map((o) => (
               <option key={o} value={o}>{o}</option>
             ))}
           </select>
-          <button onClick={() => fetchLeads(pass)} className="h-10 rounded-full border border-[#e4e0f0] bg-white px-4 font-display text-[14px] font-medium text-[#555] transition hover:bg-neutral-50">
+          <button onClick={refresh} className="h-10 rounded-full border border-[#e4e0f0] bg-white px-4 font-display text-[14px] font-medium text-[#555] transition hover:bg-neutral-50">
             Refresh
           </button>
           <button onClick={exportCsv} className="h-10 rounded-full border border-[#e4e0f0] bg-white px-4 font-display text-[14px] font-medium text-[#555] transition hover:bg-neutral-50">
             Export CSV
           </button>
-          <button onClick={() => setModal({ open: true, lead: null })} className="h-10 rounded-full bg-[#7c54d6] px-4 font-display text-[14px] font-bold text-white transition hover:bg-[#6a45c2]">
+          <button
+            onClick={() => (tab === "redeem" ? setModal({ open: true, lead: null }) : setCmoModal({ open: true, lead: null }))}
+            className="h-10 rounded-full bg-[#7c54d6] px-4 font-display text-[14px] font-bold text-white transition hover:bg-[#6a45c2]"
+          >
             + Add lead
           </button>
           <button onClick={logout} className="h-10 rounded-full px-3 font-display text-[14px] font-medium text-[#999] transition hover:text-[#555]">
@@ -427,74 +714,162 @@ export default function AdminLeads() {
         </div>
       </header>
 
+      {/* tab bar */}
+      <div className="px-5 sm:px-8">
+        <div className="flex gap-6">
+          {TABS.map((t) => (
+            <button
+              key={t.key}
+              onClick={() => switchTab(t.key)}
+              className={`-mb-px border-b-2 py-3 font-display text-[14px] font-semibold transition ${
+                tab === t.key ? "border-[#7c54d6] text-[#333]" : "border-transparent text-[#999] hover:text-[#666]"
+              }`}
+            >
+              {t.label}
+              <span
+                className={`ml-2 rounded-full px-2 py-0.5 text-[12px] font-medium ${
+                  tab === t.key ? "bg-[#f0ecff] text-[#7c54d6]" : "bg-neutral-100 text-neutral-400"
+                }`}
+              >
+                {t.count}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+      </div>
+
       {error && (
         <p className="mx-5 mt-3 rounded-lg bg-[#fff0f0] px-4 py-2 font-display text-[13px] text-[#c0392b] sm:mx-8">{error}</p>
       )}
 
       <main className="px-5 py-6 sm:px-8">
         <div className="overflow-x-auto rounded-2xl border border-black/5 bg-white shadow-[0_4px_24px_-12px_rgba(80,40,160,0.12)]">
-          <table className="w-full min-w-[940px] border-collapse text-left">
-            <thead>
-              <tr className="border-b border-black/5 bg-[#faf9ff]">
-                {COLUMNS.map((c) => (
-                  <th key={c.key} className="px-5 py-3.5">
-                    <button onClick={() => toggleSort(c.key)} className="flex items-center gap-1.5 font-display text-[13px] font-semibold uppercase tracking-wide text-[#888] transition hover:text-[#555]">
-                      {c.label}
-                      <span className={`text-[10px] ${sortKey === c.key ? "text-[#7c54d6]" : "text-transparent"}`}>
-                        {sortKey === c.key && sortDir === "asc" ? "▲" : "▼"}
-                      </span>
-                    </button>
-                  </th>
+          {tab === "redeem" ? (
+            <table className="w-full min-w-[940px] border-collapse text-left">
+              <thead>
+                <tr className="border-b border-black/5 bg-[#faf9ff]">
+                  {COLUMNS.map((c) => (
+                    <th key={c.key} className="px-5 py-3.5">
+                      <button onClick={() => toggleSort(c.key)} className="flex items-center gap-1.5 font-display text-[13px] font-semibold uppercase tracking-wide text-[#888] transition hover:text-[#555]">
+                        {c.label}
+                        <span className={`text-[10px] ${sortKey === c.key ? "text-[#7c54d6]" : "text-transparent"}`}>
+                          {sortKey === c.key && sortDir === "asc" ? "▲" : "▼"}
+                        </span>
+                      </button>
+                    </th>
+                  ))}
+                  <th className="px-5 py-3.5 font-display text-[13px] font-semibold uppercase tracking-wide text-[#888]">Phone</th>
+                  <th className="px-5 py-3.5 font-display text-[13px] font-semibold uppercase tracking-wide text-[#888]">Code</th>
+                  <th className="px-5 py-3.5 text-right font-display text-[13px] font-semibold uppercase tracking-wide text-[#888]">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((l) => (
+                  <tr key={l.id} className="border-b border-black/[0.04] transition hover:bg-[#faf9ff]">
+                    <td className="px-5 py-3">
+                      <StatusSelect value={l.status} onChange={(s) => setStatus(l.id, s)} />
+                    </td>
+                    <td className="whitespace-nowrap px-5 py-3 font-display text-[14px] font-medium text-[#333]">
+                      {l.first_name} {l.last_name}
+                    </td>
+                    <td className="px-5 py-3 font-display text-[14px] text-[#555]">{l.email}</td>
+                    <td className="px-5 py-3 font-display text-[14px] text-[#555]">{l.organization}</td>
+                    <td className="whitespace-nowrap px-5 py-3 font-display text-[14px] text-[#777]">{fmtDate(l.created_at)}</td>
+                    <td className="whitespace-nowrap px-5 py-3 font-display text-[14px] text-[#555]">{l.country_code} {l.phone}</td>
+                    <td className="whitespace-nowrap px-5 py-3">
+                      {l.discount_code ? (
+                        <span className="rounded-md bg-[#f0ecff] px-2 py-1 font-mono text-[13px] text-[#7c54d6]">{l.discount_code}</span>
+                      ) : (
+                        <span className="text-[13px] text-[#bbb]">—</span>
+                      )}
+                    </td>
+                    <td className="whitespace-nowrap px-5 py-3 text-right">
+                      <button onClick={() => setModal({ open: true, lead: l })} className="rounded-lg px-2.5 py-1.5 font-display text-[13px] font-medium text-[#7c54d6] transition hover:bg-[#f0ecff]">
+                        Edit
+                      </button>
+                      <button onClick={() => deleteLead(l)} className="rounded-lg px-2.5 py-1.5 font-display text-[13px] font-medium text-[#c0392b] transition hover:bg-[#fff0f0]">
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
                 ))}
-                <th className="px-5 py-3.5 font-display text-[13px] font-semibold uppercase tracking-wide text-[#888]">Phone</th>
-                <th className="px-5 py-3.5 font-display text-[13px] font-semibold uppercase tracking-wide text-[#888]">Code</th>
-                <th className="px-5 py-3.5 text-right font-display text-[13px] font-semibold uppercase tracking-wide text-[#888]">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((l) => (
-                <tr key={l.id} className="border-b border-black/[0.04] transition hover:bg-[#faf9ff]">
-                  <td className="px-5 py-3">
-                    <StatusSelect value={l.status} onChange={(s) => setStatus(l.id, s)} />
-                  </td>
-                  <td className="whitespace-nowrap px-5 py-3 font-display text-[14px] font-medium text-[#333]">
-                    {l.first_name} {l.last_name}
-                  </td>
-                  <td className="px-5 py-3 font-display text-[14px] text-[#555]">{l.email}</td>
-                  <td className="px-5 py-3 font-display text-[14px] text-[#555]">{l.organization}</td>
-                  <td className="whitespace-nowrap px-5 py-3 font-display text-[14px] text-[#777]">{fmtDate(l.created_at)}</td>
-                  <td className="whitespace-nowrap px-5 py-3 font-display text-[14px] text-[#555]">{l.country_code} {l.phone}</td>
-                  <td className="whitespace-nowrap px-5 py-3">
-                    {l.discount_code ? (
-                      <span className="rounded-md bg-[#f0ecff] px-2 py-1 font-mono text-[13px] text-[#7c54d6]">{l.discount_code}</span>
-                    ) : (
-                      <span className="text-[13px] text-[#bbb]">—</span>
-                    )}
-                  </td>
-                  <td className="whitespace-nowrap px-5 py-3 text-right">
-                    <button onClick={() => setModal({ open: true, lead: l })} className="rounded-lg px-2.5 py-1.5 font-display text-[13px] font-medium text-[#7c54d6] transition hover:bg-[#f0ecff]">
-                      Edit
-                    </button>
-                    <button onClick={() => deleteLead(l)} className="rounded-lg px-2.5 py-1.5 font-display text-[13px] font-medium text-[#c0392b] transition hover:bg-[#fff0f0]">
-                      Delete
-                    </button>
-                  </td>
+                {rows.length === 0 && (
+                  <tr>
+                    <td colSpan={8} className="px-5 py-16 text-center font-display text-[15px] text-[#999]">
+                      {leads.length === 0 ? "No leads yet." : "No leads match your filters."}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          ) : (
+            <table className="w-full min-w-[940px] border-collapse text-left">
+              <thead>
+                <tr className="border-b border-black/5 bg-[#faf9ff]">
+                  {CMO_COLUMNS.map((c) => (
+                    <th key={c.key} className="px-5 py-3.5">
+                      <button onClick={() => toggleCmoSort(c.key)} className="flex items-center gap-1.5 font-display text-[13px] font-semibold uppercase tracking-wide text-[#888] transition hover:text-[#555]">
+                        {c.label}
+                        <span className={`text-[10px] ${cmoSortKey === c.key ? "text-[#7c54d6]" : "text-transparent"}`}>
+                          {cmoSortKey === c.key && cmoSortDir === "asc" ? "▲" : "▼"}
+                        </span>
+                      </button>
+                    </th>
+                  ))}
+                  <th className="px-5 py-3.5 font-display text-[13px] font-semibold uppercase tracking-wide text-[#888]">Contact</th>
+                  <th className="px-5 py-3.5 text-right font-display text-[13px] font-semibold uppercase tracking-wide text-[#888]">Actions</th>
                 </tr>
-              ))}
-              {rows.length === 0 && (
-                <tr>
-                  <td colSpan={8} className="px-5 py-16 text-center font-display text-[15px] text-[#999]">
-                    {leads.length === 0 ? "No leads yet." : "No leads match your filters."}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {cmoRows.map((l) => (
+                  <tr key={l.id} className="border-b border-black/[0.04] transition hover:bg-[#faf9ff]">
+                    <td className="px-5 py-3">
+                      <StatusSelect value={l.status} onChange={(s) => setCmoStatus(l.id, s)} />
+                    </td>
+                    <td className="whitespace-nowrap px-5 py-3 font-display text-[14px] font-medium text-[#333]">{l.name}</td>
+                    <td className="px-5 py-3 font-display text-[14px] text-[#555]">{l.email}</td>
+                    <td className="px-5 py-3 font-display text-[14px] text-[#555]">{l.organization}</td>
+                    <td className="whitespace-nowrap px-5 py-3 font-display text-[14px]">
+                      {l.score != null ? (
+                        <span>
+                          <span className="font-semibold text-[#333]">{l.score}</span>
+                          {l.archetype && <span className="ml-1.5 text-[#888]">· {l.archetype}</span>}
+                        </span>
+                      ) : (
+                        <span className="text-[13px] text-[#bbb]">—</span>
+                      )}
+                    </td>
+                    <td className="whitespace-nowrap px-5 py-3 font-display text-[14px] text-[#777]">{fmtDate(l.created_at)}</td>
+                    <td className="whitespace-nowrap px-5 py-3 font-display text-[14px] text-[#555]">{l.phone}</td>
+                    <td className="whitespace-nowrap px-5 py-3 text-right">
+                      <button onClick={() => setCmoModal({ open: true, lead: l })} className="rounded-lg px-2.5 py-1.5 font-display text-[13px] font-medium text-[#7c54d6] transition hover:bg-[#f0ecff]">
+                        Edit
+                      </button>
+                      <button onClick={() => deleteCmoLead(l)} className="rounded-lg px-2.5 py-1.5 font-display text-[13px] font-medium text-[#c0392b] transition hover:bg-[#fff0f0]">
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {cmoRows.length === 0 && (
+                  <tr>
+                    <td colSpan={8} className="px-5 py-16 text-center font-display text-[15px] text-[#999]">
+                      {cmoLeads.length === 0 ? "No CMO Handbook leads yet." : "No leads match your filters."}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          )}
         </div>
       </main>
 
       {modal.open && (
         <LeadModal initial={modal.lead} onClose={() => setModal({ open: false, lead: null })} onSave={saveLead} />
+      )}
+      {cmoModal.open && (
+        <CmoLeadModal initial={cmoModal.lead} onClose={() => setCmoModal({ open: false, lead: null })} onSave={saveCmoLead} />
       )}
     </div>
   );
