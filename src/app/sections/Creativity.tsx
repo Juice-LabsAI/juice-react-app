@@ -42,7 +42,8 @@ function Arrow({ active }: { active: boolean }) {
 }
 
 function Card({ card, expanded, animate }: { card: (typeof CARDS)[number]; expanded: boolean; animate: boolean }) {
-  const [opt, setOpt] = useState(0);
+  // Click-to-select state — commented out; the option list is now static text.
+  // const [opt, setOpt] = useState(0);
   const trans = { duration: animate ? 0.45 : 0, ease: [0.4, 0, 0.2, 1] as const };
 
   return (
@@ -63,6 +64,15 @@ function Card({ card, expanded, animate }: { card: (typeof CARDS)[number]; expan
             className="overflow-hidden"
           >
             <ul className="flex flex-col gap-3.5 pt-6">
+              {/* Static text list. The interactive version (click-to-select +
+                  arrows) is preserved, commented out, at the bottom of this list. */}
+              {card.options.map((o) => (
+                <li key={o} className="flex items-center gap-2 font-body text-lg font-medium text-[#444]">
+                  {o}
+                </li>
+              ))}
+
+              {/* --- Interactive version (arrows + click-to-select) — commented out ---
               {card.options.map((o, i) => {
                 const isOn = i === opt;
                 return (
@@ -79,6 +89,7 @@ function Card({ card, expanded, animate }: { card: (typeof CARDS)[number]; expan
                   </li>
                 );
               })}
+              --- end interactive version --- */}
             </ul>
           </motion.div>
         </div>
