@@ -15,3 +15,4 @@ Website image assets/
 # raw design-drop folder for the CMO Handbook — processed asset (logo) lives in src/imports/cmo
 # (leading slash so it only matches the repo-root folder, not src/imports/cmo)
 /CMO/
+public/*.mp4
