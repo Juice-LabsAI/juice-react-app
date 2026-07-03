@@ -16,3 +16,5 @@ Website image assets/
 # (leading slash so it only matches the repo-root folder, not src/imports/cmo)
 /CMO/
 public/*.mp4
+# …except the hero spotlight video, which Vercel serves directly (kept small, ~10MB).
+!public/hero.mp4

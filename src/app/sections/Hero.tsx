@@ -1,26 +1,32 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "motion/react";
-import heroVideoPoster from "../../imports/hero-video-poster.png";
+import heroVideoPoster from "../../imports/hero-v1-poster.png";
 
-// The hero video lives at public/hero.mp4 (served at /hero.mp4). It's a raw
-// motion graphic with no border, so the yellow frame is recreated in CSS below.
-// Until the file exists the poster shows and the sticky-video behaviour stays off.
+// The hero video lives at public/hero.mp4 (served at /hero.mp4) — a raw motion
+// graphic with no border, so the yellow frame is recreated in CSS. Until the file
+// exists the poster shows and the sticky-video behaviour stays off.
 const HERO_VIDEO_SRC = "/hero.mp4";
+const VIDEO_ASPECT = 1920 / 1162; // source clip aspect ratio
 
-// Tunable scroll-reveal positions (viewport-relative translateY). The framed
-// video is taller than the old image, so it roughly fills the viewport when centred.
-const IMG_PEEK = "80vh"; // frame barely peeking (~20%) at the bottom on load
-const IMG_CENTER = "8vh"; // frame risen to fill/centre — where the video plays
-const TITLE_RISE = "-24vh"; // how far the title floats up as it's covered
-const REVEAL_END = 0.85; // scroll progress at which the frame is centered
-const REARM_BELOW = 0.55; // once you scroll this far clear of the video, the stickiness re-arms
-const SKIP_SCROLL = 2200; // px of extra scrolling needed to break out while the video plays
+// Scroll-scrubbed phases (progress 0 → 1 over a tall pinned track):
+//   0 … RISE_END   the yellow-framed card rises from a bottom peek up to the navbar
+//   RISE_END … EXPAND_END   its top reaches the navbar and it grows to a full-screen
+//                            "spotlight" — yellow frame on all four viewport edges
+//   at EXPAND_END  the video autoplays and the page holds (sticky) until it ends /
+//                  you scroll far enough / you hit skip; scrolling up shrinks it back.
+const RISE_END = 0.34; // peek → rest at the navbar
+const EXPAND_END = 0.54; // rest → full-viewport spotlight (video autoplays / holds here)
+const SHRINK_END = 0.82; // spotlight → back down to the normal card size as you scroll on
+const REARM_BELOW = 0.2; // once clear of the spotlight, stickiness re-arms
+const SKIP_SCROLL = 2200; // px of extra scrolling needed to break out while it plays
 const SETTLE_MS = 750; // ignore the entering scroll's momentum this long before counting an escape
-const HOLD_TIMEOUT = 25000; // ms — fallback release if the video's duration is unknown
+const HOLD_TIMEOUT = 130000; // ms — fallback release if the video's duration is unknown
 const HERO_ALT = "Juice — AI that builds ads engineered to outperform";
 
-// Yellow frame (matches the original image: #FFD950, ~3.8% border of the width).
-const FRAME = "overflow-hidden rounded-[clamp(18px,2vw,34px)] bg-[#FFD950] p-[3.8%]";
+const NAV_TOP = 86; // navbar height — where the frame's top comes to rest before expanding
+
+// Yellow frame colour (matches the original: #FFD950).
+const FRAME = "overflow-hidden rounded-[clamp(18px,2vw,34px)] bg-[#FFD950] p-[3.4%]";
 const FRAME_INNER = "block w-full rounded-[clamp(11px,1.3vw,22px)]";
 
 function useIsDesktop() {
@@ -33,6 +39,25 @@ function useIsDesktop() {
     return () => m.removeEventListener("change", f);
   }, []);
   return d;
+}
+
+function useViewport() {
+  // Width uses clientWidth (excludes the scrollbar): the pinned frame lives inside
+  // an overflow-hidden container that is only clientWidth wide, so sizing the
+  // spotlight to innerWidth would push its right edge (and yellow border) under the
+  // clip. Height uses innerHeight to match the `h-screen` (100vh) container.
+  const read = () => ({
+    w: typeof document !== "undefined" ? document.documentElement.clientWidth : 1440,
+    h: typeof window !== "undefined" ? window.innerHeight : 900,
+  });
+  const [vp, setVp] = useState(read);
+  useEffect(() => {
+    const f = () => setVp(read());
+    f();
+    window.addEventListener("resize", f);
+    return () => window.removeEventListener("resize", f);
+  }, []);
+  return vp;
 }
 
 /* Headline gradient sweep (light band passes L→R) — the hero's dominant focus. */
@@ -69,36 +94,57 @@ export default function Hero() {
   const reduce = useReducedMotion();
   const isDesktop = useIsDesktop();
   const interactive = isDesktop && !reduce;
+  const vp = useViewport();
 
-  // Scroll-scrubbed reveal: the section pins (sticky) while you scroll through a
-  // tall track. Progress 0 → 1 drives the animation, so it's fully reversible.
+  // Card (resting) geometry — matched to .container-juice (max-width 1440,
+  // padding clamp(20px, 3.6vw, 52px)) so the framed video lines up exactly with
+  // the headline and every other section. The spotlight geometry is the full viewport.
+  const containerW = Math.min(1440, vp.w);
+  const sidePad = Math.max(20, Math.min(vp.w * 0.036, 52));
+  const cardW = containerW - sidePad * 2;
+  const cardPad = cardW * 0.03;
+  const cardH = (cardW - cardPad * 2) / VIDEO_ASPECT + cardPad * 2;
+  const centeredX = (vp.w - containerW) / 2 + sidePad;
+  const spotPad = Math.max(16, Math.round(vp.w * 0.02));
+
   const trackRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const { scrollYProgress } = useScroll({ target: trackRef, offset: ["start start", "end end"] });
   const p = useSpring(scrollYProgress, { stiffness: 60, damping: 26, restDelta: 0.0004 });
 
-  const imageY = useTransform(p, [0, REVEAL_END], [IMG_PEEK, IMG_CENTER]);
-  const titleY = useTransform(p, [0, REVEAL_END], ["0vh", TITLE_RISE]);
-  const titleOpacity = useTransform(p, [0, REVEAL_END * 0.85], [1, 0]);
+  // Frame morph: peek → rest at navbar → full-viewport spotlight → back to card.
+  // The spotlight grows (RISE_END→EXPAND_END) and then shrinks back to the normal
+  // card size (EXPAND_END→SHRINK_END) as you scroll on toward the next section.
+  const frameTop = useTransform(p, [0, RISE_END, EXPAND_END, SHRINK_END], [vp.h * 0.8, NAV_TOP, 0, NAV_TOP]);
+  const frameLeft = useTransform(p, [RISE_END, EXPAND_END, SHRINK_END], [centeredX, 0, centeredX]);
+  const frameW = useTransform(p, [RISE_END, EXPAND_END, SHRINK_END], [cardW, vp.w, cardW]);
+  const frameH = useTransform(p, [RISE_END, EXPAND_END, SHRINK_END], [cardH, vp.h, cardH]);
+  const frameRadius = useTransform(p, [RISE_END, EXPAND_END, SHRINK_END], [30, 6, 30]);
+  const framePad = useTransform(p, [RISE_END, EXPAND_END, SHRINK_END], [cardPad, spotPad, cardPad]);
+  const innerRadius = useTransform(p, [RISE_END, EXPAND_END, SHRINK_END], [18, 3, 18]);
 
-  // ---- sticky-video hold ----------------------------------------------------
-  // When the frame reaches centre the video autoplays and the page becomes
-  // "sticky": downward scroll is held until the video ends (you can still break
-  // out by scrolling a lot, or by scrolling back up). Once it has played through,
-  // the stickiness is gone for good.
+  // Title floats up + fades as the frame rises over it, and returns as it shrinks back.
+  const titleY = useTransform(p, [0, RISE_END, EXPAND_END, SHRINK_END], ["0vh", "-24vh", "-24vh", "0vh"]);
+  const titleOpacity = useTransform(p, [0, RISE_END * 0.9, EXPAND_END, SHRINK_END], [1, 0, 0, 1]);
+
+  // Once expansion begins the frame lifts above the navbar so the spotlight can own
+  // all four viewport edges; shrinking back drops it below the navbar again.
+  const [expanded, setExpanded] = useState(false);
+  const [playing, setPlaying] = useState(false); // true while the held video plays (shows the skip)
+
+  // ---- sticky-video hold (same model as before, now triggered at full spotlight) ----
   const lockedRef = useRef(false);
   const playedRef = useRef(false);
   const accumRef = useRef(0);
   const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const finishHoldRef = useRef<() => void>(() => {});
-  const [playing, setPlaying] = useState(false); // true while the held video is playing (shows the skip)
 
   useEffect(() => {
     if (!interactive) return;
     const v = videoRef.current;
     if (!v) return;
 
-    let settleUntil = 0; // absorb the scroll momentum that carried us to centre
+    let settleUntil = 0;
     let playStarted = false;
 
     const releaseHold = () => {
@@ -112,19 +158,18 @@ export default function Hero() {
       window.removeEventListener("keydown", onKey, true);
     };
     const finishHold = () => {
-      playedRef.current = true; // stickiness gone for good
+      playedRef.current = true;
       releaseHold();
     };
-    finishHoldRef.current = finishHold; // let the skip button release the hold
+    finishHoldRef.current = finishHold;
 
-    // Count an escape only after the entering scroll's momentum has settled.
     const bump = (amount: number) => {
       if (Date.now() < settleUntil) return;
       accumRef.current += amount;
       if (accumRef.current > SKIP_SCROLL) finishHold();
     };
     const onWheel = (e: WheelEvent) => {
-      if (e.deltaY <= 0) return; // let upward scroll reverse out of the video
+      if (e.deltaY <= 0) return; // let upward scroll reverse / shrink the spotlight
       e.preventDefault();
       bump(e.deltaY);
     };
@@ -138,54 +183,50 @@ export default function Hero() {
         bump(200);
       }
     };
-    // Play only once the frame has fully settled into focus (centred).
     const startPlayback = () => {
       if (playStarted || !lockedRef.current) return;
       playStarted = true;
       setPlaying(true);
-      try { v.currentTime = 0; } catch { /* not seekable yet */ } // always replay from the start
-      // Safety release scaled to the actual video length (falls back if unknown).
+      try { v.currentTime = 0; } catch { /* not seekable yet */ }
       const ms = isFinite(v.duration) && v.duration > 0 ? v.duration * 1000 + 4000 : HOLD_TIMEOUT;
       holdTimer.current = setTimeout(finishHold, ms);
-      v.play().catch(() => finishHold()); // if the video can't play, don't trap the user
+      v.play().catch(() => finishHold());
     };
     const engageHold = () => {
       lockedRef.current = true;
       accumRef.current = 0;
       settleUntil = Date.now() + SETTLE_MS;
-      // Snap the frame to exactly centered (handles fast/fling scrolls landing past it).
       const track = trackRef.current;
-      if (track) window.scrollTo(0, track.offsetTop + REVEAL_END * (track.offsetHeight - window.innerHeight));
+      if (track) window.scrollTo(0, track.offsetTop + EXPAND_END * (track.offsetHeight - window.innerHeight));
       window.addEventListener("wheel", onWheel, { passive: false });
       window.addEventListener("touchmove", onTouchMove, { passive: false, capture: true });
       window.addEventListener("keydown", onKey, true);
-      if (p.get() >= REVEAL_END - 0.01) startPlayback(); // already fully centred
+      if (p.get() >= EXPAND_END - 0.01) startPlayback();
     };
     const onEnded = () => finishHold();
-    const onError = () => finishHold(); // broken/missing video → treat as done, never trap
+    const onError = () => finishHold();
     v.addEventListener("ended", onEnded);
     v.addEventListener("error", onError);
 
     const stop = scrollYProgress.on("change", (val) => {
       if (lockedRef.current) {
-        // scrolled back up out of the video before it finished → release & reset
-        if (val < REVEAL_END - 0.1) {
+        if (val < EXPAND_END - 0.1) {
           releaseHold();
           v.pause();
           v.currentTime = 0;
         }
         return;
       }
-      if (!playedRef.current && val >= REVEAL_END) {
+      if (!playedRef.current && val >= EXPAND_END) {
         engageHold();
       } else if (playedRef.current && val < REARM_BELOW) {
-        // scrolled well clear of the video → re-arm so it sticks again on the next visit
         playedRef.current = false;
       }
     });
-    // The spring lags the raw scroll — start the video the moment it's fully centred.
     const stopP = p.on("change", (val) => {
-      if (lockedRef.current && !playStarted && val >= REVEAL_END - 0.01) startPlayback();
+      // Enlarged (above card size) → lift above the navbar; shrunk back → drop below it.
+      setExpanded(val > RISE_END + 0.015 && val < SHRINK_END - 0.01);
+      if (lockedRef.current && !playStarted && val >= EXPAND_END - 0.01) startPlayback();
     });
 
     return () => {
@@ -198,19 +239,18 @@ export default function Hero() {
   }, [interactive, scrollYProgress, p]);
 
   const handleSkip = () => {
-    finishHoldRef.current(); // release the sticky hold
+    finishHoldRef.current();
     const track = trackRef.current;
     if (track) window.scrollTo({ top: track.offsetTop + track.offsetHeight, behavior: "smooth" });
   };
 
-  // ---- non-interactive (mobile / reduced motion): static, normally-scrolling hero ----
+  // ---- non-interactive (mobile / reduced motion): static framed poster ----
   if (!interactive) {
     return (
       <section className="relative overflow-hidden pt-[104px] pb-0 sm:pt-[116px]">
         <div className="container-juice">
           <Headline className="text-[clamp(2.5rem,9vw,4.5rem)]" />
           <div className="mt-9 sm:mt-12">
-            {/* Framed poster on mobile / reduced-motion (no scroll-sticky video). */}
             <div className={FRAME}>
               <img src={heroVideoPoster} alt={HERO_ALT} className={FRAME_INNER} draggable={false} />
             </div>
@@ -220,10 +260,13 @@ export default function Hero() {
     );
   }
 
-  // ---- interactive: pinned, scroll-scrubbed reveal + sticky video ----
+  // ---- interactive: pinned, scroll-scrubbed rise → full-screen spotlight ----
   return (
-    <section ref={trackRef} className="relative h-[220vh]">
-      <div className="sticky top-0 h-screen overflow-hidden">
+    <section ref={trackRef} className="relative h-[260vh]">
+      {/* `position: sticky` makes its own stacking context, which would trap the
+          frame below the fixed navbar (z-50). While the spotlight is enlarged we
+          lift the whole sticky layer above the navbar so it covers all four edges. */}
+      <div className={`sticky top-0 h-screen overflow-hidden ${expanded ? "z-[60]" : ""}`}>
         {/* Title layer — floats up and fades as the frame rises over it. */}
         <motion.div className="absolute inset-0 z-10 flex items-start" style={{ y: titleY, opacity: titleOpacity }}>
           <div className="container-juice pt-[clamp(120px,16vh,220px)]">
@@ -231,40 +274,49 @@ export default function Hero() {
           </div>
         </motion.div>
 
-        {/* Yellow-framed video — barely peeks on load, floats up to centre, autoplays there. */}
-        <motion.div className="absolute inset-x-0 top-0 z-20" style={{ y: imageY }}>
-          <div className="container-juice">
-            <div className={FRAME}>
-              <video
-                ref={videoRef}
-                className={FRAME_INNER}
-                poster={heroVideoPoster}
-                muted
-                playsInline
-                preload="auto"
-              >
-                <source src={HERO_VIDEO_SRC} type="video/mp4" />
-              </video>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Faint "skip" — appears at the bottom of the viewport while the held video plays. */}
-        {playing && (
-          <motion.button
-            type="button"
-            onClick={handleSkip}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="absolute bottom-5 left-1/2 z-30 flex -translate-x-1/2 items-center gap-1.5 rounded-full px-4 py-2 font-display text-[13px] font-medium text-[#444]/45 transition-colors hover:text-[#444]/85"
+        {/* Yellow-framed video — peeks, rises to the navbar, then grows to fill every
+            edge of the viewport (spotlight) where it autoplays. */}
+        <motion.div
+          className="absolute z-20"
+          style={{
+            top: frameTop,
+            left: frameLeft,
+            width: frameW,
+            height: frameH,
+            borderRadius: frameRadius,
+            padding: framePad,
+            backgroundColor: "#FFD950",
+          }}
+        >
+          <motion.video
+            ref={videoRef}
+            className="block h-full w-full object-cover"
+            style={{ borderRadius: innerRadius }}
+            poster={heroVideoPoster}
+            muted
+            playsInline
+            preload="auto"
           >
-            Skip video
-            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden>
-              <path d="M8 3v10M4 9l4 4 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </motion.button>
-        )}
+            <source src={HERO_VIDEO_SRC} type="video/mp4" />
+          </motion.video>
+
+          {/* Faint "skip" — appears while the spotlight video plays. */}
+          {playing && (
+            <motion.button
+              type="button"
+              onClick={handleSkip}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              className="absolute bottom-7 left-1/2 z-[61] flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-black/25 px-4 py-2 font-display text-[13px] font-medium text-white/85 backdrop-blur-sm transition-colors hover:bg-black/40 hover:text-white"
+            >
+              Skip video
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden>
+                <path d="M8 3v10M4 9l4 4 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </motion.button>
+          )}
+        </motion.div>
       </div>
     </section>
   );
