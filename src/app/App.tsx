@@ -1,7 +1,7 @@
 import Nav from "./sections/Nav";
 import Hero from "./sections/Hero";
 import TrustedLogos from "./sections/TrustedLogos";
-import Campaign from "./sections/Campaign";
+import BriefCarousel from "./sections/BriefCarousel";
 import Creatives from "./sections/Creatives";
 import Creativity from "./sections/Creativity";
 import Features from "./sections/Features";
@@ -18,7 +18,7 @@ export default function App() {
       <main>
         <Hero />
         <TrustedLogos />
-        <Campaign />
+        <BriefCarousel />
         <Creatives />
         <Creativity />
         <Features />
