@@ -1,5 +1,6 @@
 import Logo from "./Logo";
 import can from "../../imports/footer-can.png";
+import { openWaitlist } from "../../lib/waitlist";
 
 const BUTTONS = ["Join the Waitlist", /* "About us" — commented out for now */ "Get a Demo"];
 
@@ -12,18 +13,20 @@ export default function Footer({ lowCan = false }: { lowCan?: boolean }) {
       <img
         src={can}
         alt="Juice — Cold Pressed Clarity can"
-        className={`pointer-events-none absolute right-[2%] z-20 w-[clamp(210px,28vw,440px)] rotate-[13deg] select-none lg:right-[4%] ${
-          lowCan ? "-top-[clamp(60px,7vw,150px)]" : "-top-[clamp(150px,21vw,380px)]"
+        className={`pointer-events-none absolute right-[3%] z-20 w-[132px] rotate-[13deg] select-none sm:right-[2%] sm:w-[clamp(210px,28vw,440px)] lg:right-[4%] ${
+          lowCan
+            ? "-top-[46px] sm:-top-[clamp(60px,7vw,150px)]"
+            : "-top-[74px] sm:-top-[clamp(150px,21vw,380px)]"
         }`}
         draggable={false}
       />
 
-      <div className="relative overflow-hidden rounded-t-[32px] bg-[#601db4] px-6 pt-16 pb-10 sm:px-12 lg:min-h-[600px] lg:px-[88px] lg:pt-[90px]">
-        {/* GOT JUICE watermark, bottom-left, behind */}
+      <div className="relative overflow-hidden rounded-t-[32px] bg-[#601db4] px-6 pt-16 pb-28 sm:px-12 sm:pb-10 lg:min-h-[600px] lg:px-[88px] lg:pt-[90px]">
+        {/* GOT JUICE watermark, bottom, behind the content */}
         <span
           aria-hidden
           style={{ fontFamily: "'Anton', sans-serif", letterSpacing: "0.01em" }}
-          className="pointer-events-none absolute -bottom-3 left-0 z-0 w-full select-none whitespace-nowrap text-center text-[clamp(56px,16vw,240px)] uppercase leading-[0.8] text-[#8948de] sm:left-[56px] sm:text-left"
+          className="pointer-events-none absolute -bottom-2 left-0 z-0 w-full select-none whitespace-nowrap text-center text-[clamp(46px,13vw,240px)] uppercase leading-[0.8] text-[#8948de] sm:left-[56px] sm:text-left sm:text-[clamp(56px,16vw,240px)]"
         >
           got juice?
         </span>
@@ -41,13 +44,14 @@ export default function Footer({ lowCan = false }: { lowCan?: boolean }) {
         <div className="relative z-10 mt-16 flex flex-col gap-5 lg:mt-28 lg:items-end">
           <div className="flex flex-wrap gap-4">
             {BUTTONS.map((b) => (
-              <a
+              <button
                 key={b}
-                href="#waitlist"
+                type="button"
+                onClick={openWaitlist}
                 className="rounded-full bg-[#bba0ff] px-6 py-3.5 font-display text-sm font-bold leading-none text-[#444] transition-transform duration-200 hover:scale-[1.04]"
               >
                 {b}
-              </a>
+              </button>
             ))}
           </div>
           <div className="flex gap-8 font-display text-base text-white/80">

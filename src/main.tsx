@@ -7,6 +7,7 @@
   import Redeem from "./app/Redeem.tsx";
   import AdminLeads from "./app/AdminLeads.tsx";
   import CMOHandbook from "./app/CMOHandbook.tsx";
+  import WaitlistPopup from "./app/sections/WaitlistPopup.tsx";
   import "./styles/index.css";
 
   createRoot(document.getElementById("root")!).render(
@@ -19,5 +20,6 @@
         <Route path="/admin-leads" element={<AdminLeads />} />
         <Route path="/CMO-Handbook" element={<CMOHandbook />} />
       </Routes>
+      <WaitlistPopup />
     </BrowserRouter>,
   );

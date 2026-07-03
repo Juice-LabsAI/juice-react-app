@@ -1,16 +1,19 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, useLocation } from "react-router";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { SolutionsMenu, ComingSoonMenu } from "./NavMenus";
-import juiceLogo from "../../imports/juice-logo.png";
+import Logo from "./Logo";
+// Nav dropdown menus are hidden pre-launch (see the commented LINKS below).
+// import { SolutionsMenu, ComingSoonMenu } from "./NavMenus";
+import { openWaitlist } from "../../lib/waitlist";
 
 type NavLink = { label: string; href?: string; key?: string; menu?: ReactNode };
 
+// Nav items are hidden for now (pre-launch). Uncomment to restore.
 const LINKS: NavLink[] = [
-  { label: "Product", key: "product", menu: <ComingSoonMenu label="Product" /> },
-  { label: "Solutions", key: "solutions", menu: <SolutionsMenu /> },
-  { label: "Resources", key: "resources", menu: <ComingSoonMenu label="Resources" /> },
-  { label: "Pricing", href: "#twoparts" },
+  // { label: "Product", key: "product", menu: <ComingSoonMenu label="Product" /> },
+  // { label: "Solutions", key: "solutions", menu: <SolutionsMenu /> },
+  // { label: "Resources", key: "resources", menu: <ComingSoonMenu label="Resources" /> },
+  // { label: "Pricing", href: "#twoparts" },
 ];
 
 function Caret({ open }: { open?: boolean }) {
@@ -35,13 +38,13 @@ function Wordmark() {
   if (pathname === "/") {
     return (
       <a href="#top" className="block select-none" aria-label="Juice home">
-        <img src={juiceLogo} alt="Juice" className="h-[50px] w-auto" draggable={false} />
+        <Logo className="h-[50px] w-auto" />
       </a>
     );
   }
   return (
     <Link to="/" className="block select-none" aria-label="Juice home">
-      <img src={juiceLogo} alt="Juice" className="h-[50px] w-auto" draggable={false} />
+      <Logo className="h-[50px] w-auto" />
     </Link>
   );
 }
@@ -124,12 +127,13 @@ export default function Nav() {
         </ul>
 
         <div className="flex items-center gap-3">
-          <a
-            href="#waitlist"
+          <button
+            type="button"
+            onClick={openWaitlist}
             className="hidden rounded-full bg-[#333] px-6 py-[15px] font-display text-[16px] font-bold leading-none text-white transition-transform duration-200 hover:scale-[1.03] sm:inline-block"
           >
             Join the waitlist
-          </a>
+          </button>
 
           {/* hamburger (mobile / tablet) */}
           <button
@@ -192,13 +196,13 @@ export default function Nav() {
                 </li>
               ))}
               <li className="mt-2">
-                <a
-                  href="#waitlist"
-                  onClick={() => setOpen(false)}
-                  className="block rounded-full bg-ink px-6 py-3 text-center font-display text-base font-bold text-white"
+                <button
+                  type="button"
+                  onClick={() => { setOpen(false); openWaitlist(); }}
+                  className="block w-full rounded-full bg-ink px-6 py-3 text-center font-display text-base font-bold text-white"
                 >
                   Join the waitlist
-                </a>
+                </button>
               </li>
             </ul>
           </motion.div>

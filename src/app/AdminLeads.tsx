@@ -31,6 +31,16 @@ type CmoLead = {
   status: string;
 };
 
+type WaitlistLead = {
+  id: string;
+  created_at: string;
+  name: string;
+  organization: string;
+  email: string;
+  message: string | null;
+  status: string;
+};
+
 // Canonical order for displaying the per-dimension scores (jsonb loses key order).
 const CMO_DIMENSIONS = [
   "Organizational Readiness",
@@ -45,7 +55,7 @@ function dimensionEntries(d: Record<string, number> | null): { name: string; sco
   return CMO_DIMENSIONS.filter((n) => d[n] != null).map((n) => ({ name: n, score: d[n] }));
 }
 
-type TabKey = "redeem" | "cmo";
+type TabKey = "redeem" | "cmo" | "waitlist";
 
 const STATUSES = ["New", "Reached Out", "Demo Set", "Closed"] as const;
 const STATUS_STYLE: Record<string, { pill: string; dot: string }> = {
@@ -71,6 +81,15 @@ const CMO_COLUMNS: { key: CmoSortKey; label: string }[] = [
   { key: "email", label: "Email" },
   { key: "organization", label: "Organization" },
   { key: "score", label: "Readiness" },
+  { key: "created_at", label: "Date" },
+];
+
+type WaitlistSortKey = "created_at" | "name" | "email" | "organization" | "status";
+const WAITLIST_COLUMNS: { key: WaitlistSortKey; label: string }[] = [
+  { key: "status", label: "Status" },
+  { key: "name", label: "Name" },
+  { key: "email", label: "Email" },
+  { key: "organization", label: "Organization" },
   { key: "created_at", label: "Date" },
 ];
 
@@ -366,6 +385,95 @@ function CmoLeadModal({
   );
 }
 
+/* ---- add / edit modal (Waitlist leads) ---- */
+type WaitlistLeadForm = {
+  id?: string;
+  name: string;
+  organization: string;
+  email: string;
+  message: string;
+  status: string;
+};
+
+function WaitlistLeadModal({
+  initial,
+  onClose,
+  onSave,
+}: {
+  initial: WaitlistLead | null;
+  onClose: () => void;
+  onSave: (f: WaitlistLeadForm) => Promise<string | null>;
+}) {
+  const [f, setF] = useState<WaitlistLeadForm>(() => ({
+    id: initial?.id,
+    name: initial?.name ?? "",
+    organization: initial?.organization ?? "",
+    email: initial?.email ?? "",
+    message: initial?.message ?? "",
+    status: initial?.status ?? "New",
+  }));
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  const set = (k: keyof WaitlistLeadForm, v: string) => setF((p) => ({ ...p, [k]: v }));
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!f.name.trim() || !f.organization.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email.trim())) {
+      setErr("Please fill in all required fields correctly.");
+      return;
+    }
+    setBusy(true);
+    const e2 = await onSave(f);
+    setBusy(false);
+    if (e2) setErr(e2);
+    else onClose();
+  };
+
+  return createPortal(
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/30 p-4" onMouseDown={onClose}>
+      <form
+        onMouseDown={(e) => e.stopPropagation()}
+        onSubmit={submit}
+        className="max-h-[90vh] w-full max-w-[520px] overflow-y-auto rounded-[20px] bg-white p-6 shadow-2xl sm:p-7"
+      >
+        <h2 className="font-body text-2xl font-extrabold text-[#444]">{initial ? "Edit lead" : "Add lead"}</h2>
+        <input className={`${mInput} mt-5`} placeholder="Full name *" value={f.name} onChange={(e) => set("name", e.target.value)} />
+        <input className={`${mInput} mt-4`} placeholder="Organisation *" value={f.organization} onChange={(e) => set("organization", e.target.value)} />
+        <input className={`${mInput} mt-4`} type="email" placeholder="Business email *" value={f.email} onChange={(e) => set("email", e.target.value)} />
+        <textarea className={`${mInput} mt-4 h-auto py-3`} rows={3} placeholder="What can Juice AI do for you? (optional)" value={f.message} onChange={(e) => set("message", e.target.value)} />
+        <div className="mt-5">
+          <span className="font-display text-[13px] font-medium text-[#555]">Status</span>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {STATUSES.map((s) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => set("status", s)}
+                className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 font-display text-[13px] font-medium transition ${
+                  f.status === s ? STATUS_STYLE[s].pill + " ring-1 ring-current/30" : "bg-neutral-100 text-neutral-500"
+                }`}
+              >
+                <span className={`size-1.5 rounded-full ${f.status === s ? STATUS_STYLE[s].dot : "bg-neutral-400"}`} />
+                {s}
+              </button>
+            ))}
+          </div>
+        </div>
+        {err && <p className="mt-4 rounded-lg bg-[#fff0f0] px-3 py-2 font-display text-[13px] text-[#c0392b]">{err}</p>}
+        <div className="mt-6 flex justify-end gap-3">
+          <button type="button" onClick={onClose} className="h-11 rounded-full px-5 font-display text-[14px] font-medium text-[#777] transition hover:bg-neutral-100">
+            Cancel
+          </button>
+          <button type="submit" disabled={busy} className="h-11 rounded-full bg-[#333] px-6 font-display text-[14px] font-bold text-white transition hover:bg-[#222] disabled:opacity-60">
+            {busy ? "Saving…" : initial ? "Save changes" : "Add lead"}
+          </button>
+        </div>
+      </form>
+    </div>,
+    document.body,
+  );
+}
+
 export default function AdminLeads() {
   const [pass, setPass] = useState("");
   const [authed, setAuthed] = useState(false);
@@ -376,6 +484,7 @@ export default function AdminLeads() {
 
   const [leads, setLeads] = useState<Lead[]>([]);
   const [cmoLeads, setCmoLeads] = useState<CmoLead[]>([]);
+  const [waitlistLeads, setWaitlistLeads] = useState<WaitlistLead[]>([]);
 
   const [query, setQuery] = useState("");
   const [orgFilter, setOrgFilter] = useState("");
@@ -384,8 +493,11 @@ export default function AdminLeads() {
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [cmoSortKey, setCmoSortKey] = useState<CmoSortKey>("created_at");
   const [cmoSortDir, setCmoSortDir] = useState<"asc" | "desc">("desc");
+  const [waitlistSortKey, setWaitlistSortKey] = useState<WaitlistSortKey>("created_at");
+  const [waitlistSortDir, setWaitlistSortDir] = useState<"asc" | "desc">("desc");
   const [modal, setModal] = useState<{ open: boolean; lead: Lead | null }>({ open: false, lead: null });
   const [cmoModal, setCmoModal] = useState<{ open: boolean; lead: CmoLead | null }>({ open: false, lead: null });
+  const [waitlistModal, setWaitlistModal] = useState<{ open: boolean; lead: WaitlistLead | null }>({ open: false, lead: null });
 
   // Auth is intentionally kept in memory only — the password gate reappears on
   // every page reload (no sessionStorage / localStorage persistence).
@@ -404,7 +516,14 @@ export default function AdminLeads() {
     return null;
   };
 
-  // Unlock: authenticate against the redeem list, then load both datasets.
+  const fetchWaitlistLeads = async (password: string) => {
+    const { data, error: err } = await supabase.rpc("admin_list_waitlist_leads", { p_pass: password });
+    if (err) return err;
+    setWaitlistLeads((data ?? []) as WaitlistLead[]);
+    return null;
+  };
+
+  // Unlock: authenticate against the redeem list, then load the other datasets.
   const unlock = async (password: string) => {
     setLoading(true);
     setError("");
@@ -414,14 +533,16 @@ export default function AdminLeads() {
       setError(/unauthor/i.test(err.message) ? "Incorrect password." : "Couldn’t load leads. Try again.");
       return;
     }
-    await fetchCmoLeads(password); // errors here surface on the CMO tab via its empty state
+    await fetchCmoLeads(password); // errors here surface on each tab via its empty state
+    await fetchWaitlistLeads(password);
     setLoading(false);
     setAuthed(true);
   };
 
   const refresh = async () => {
     setError("");
-    const err = tab === "redeem" ? await fetchLeads(pass) : await fetchCmoLeads(pass);
+    const err =
+      tab === "redeem" ? await fetchLeads(pass) : tab === "cmo" ? await fetchCmoLeads(pass) : await fetchWaitlistLeads(pass);
     if (err) setError("Couldn’t refresh. Try again.");
   };
 
@@ -510,6 +631,46 @@ export default function AdminLeads() {
     }
   };
 
+  /* ---- Waitlist CRUD ---- */
+  const setWaitlistStatus = async (id: string, status: string) => {
+    const prev = waitlistLeads;
+    setWaitlistLeads((ls) => ls.map((l) => (l.id === id ? { ...l, status } : l))); // optimistic
+    const { error: err } = await supabase.rpc("admin_set_waitlist_status", { p_pass: pass, p_id: id, p_status: status });
+    if (err) {
+      setWaitlistLeads(prev);
+      setError("Couldn’t update status.");
+    }
+  };
+
+  const saveWaitlistLead = async (f: WaitlistLeadForm): Promise<string | null> => {
+    const args = {
+      p_pass: pass,
+      p_name: f.name,
+      p_organization: f.organization,
+      p_email: f.email,
+      p_message: f.message,
+      p_status: f.status,
+    };
+    const { data, error: err } = f.id
+      ? await supabase.rpc("admin_update_waitlist_lead", { ...args, p_id: f.id })
+      : await supabase.rpc("admin_create_waitlist_lead", args);
+    if (err) return /unauthor/i.test(err.message) ? "Session expired — unlock again." : "Couldn’t save the lead.";
+    const row = data as WaitlistLead;
+    setWaitlistLeads((ls) => (f.id ? ls.map((l) => (l.id === row.id ? row : l)) : [row, ...ls]));
+    return null;
+  };
+
+  const deleteWaitlistLead = async (l: WaitlistLead) => {
+    if (!window.confirm(`Delete ${l.name}? This can’t be undone.`)) return;
+    const prev = waitlistLeads;
+    setWaitlistLeads((ls) => ls.filter((x) => x.id !== l.id));
+    const { error: err } = await supabase.rpc("admin_delete_waitlist_lead", { p_pass: pass, p_id: l.id });
+    if (err) {
+      setWaitlistLeads(prev);
+      setError("Couldn’t delete the lead.");
+    }
+  };
+
   /* ---- derived: Redeem rows ---- */
   const orgs = useMemo(() => Array.from(new Set(leads.map((l) => l.organization).filter(Boolean))).sort(), [leads]);
   const rows = useMemo(() => {
@@ -562,6 +723,40 @@ export default function AdminLeads() {
     });
   }, [cmoLeads, query, orgFilter, statusFilter, cmoSortKey, cmoSortDir]);
 
+  /* ---- derived: Waitlist rows ---- */
+  const waitlistOrgs = useMemo(
+    () => Array.from(new Set(waitlistLeads.map((l) => l.organization).filter(Boolean))).sort(),
+    [waitlistLeads],
+  );
+  const waitlistRows = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const out = waitlistLeads.filter((l) => {
+      if (orgFilter && l.organization !== orgFilter) return false;
+      if (statusFilter && l.status !== statusFilter) return false;
+      if (!q) return true;
+      return [l.name, l.email, l.organization, l.message ?? ""]
+        .join(" ")
+        .toLowerCase()
+        .includes(q);
+    });
+    const val = (l: WaitlistLead) =>
+      waitlistSortKey === "created_at" ? l.created_at : String(l[waitlistSortKey] ?? "").toLowerCase();
+    return [...out].sort((a, b) => {
+      const av = val(a);
+      const bv = val(b);
+      const cmp = av < bv ? -1 : av > bv ? 1 : 0;
+      return waitlistSortDir === "asc" ? cmp : -cmp;
+    });
+  }, [waitlistLeads, query, orgFilter, statusFilter, waitlistSortKey, waitlistSortDir]);
+
+  const toggleWaitlistSort = (key: WaitlistSortKey) => {
+    if (key === waitlistSortKey) setWaitlistSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    else {
+      setWaitlistSortKey(key);
+      setWaitlistSortDir(key === "created_at" ? "desc" : "asc");
+    }
+  };
+
   const toggleSort = (key: SortKey) => {
     if (key === sortKey) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     else {
@@ -586,9 +781,9 @@ export default function AdminLeads() {
     setError("");
   };
 
-  const activeOrgs = tab === "redeem" ? orgs : cmoOrgs;
-  const activeCount = tab === "redeem" ? rows.length : cmoRows.length;
-  const activeTotal = tab === "redeem" ? leads.length : cmoLeads.length;
+  const activeOrgs = tab === "redeem" ? orgs : tab === "cmo" ? cmoOrgs : waitlistOrgs;
+  const activeCount = tab === "redeem" ? rows.length : tab === "cmo" ? cmoRows.length : waitlistRows.length;
+  const activeTotal = tab === "redeem" ? leads.length : tab === "cmo" ? cmoLeads.length : waitlistLeads.length;
 
   const exportCsv = () => {
     const esc = (v: string | number) => `"${String(v ?? "").replace(/"/g, '""')}"`;
@@ -600,6 +795,11 @@ export default function AdminLeads() {
         [l.status, l.first_name, l.last_name, `${l.country_code} ${l.phone}`, l.email, l.organization, l.discount_code ?? "", fmtDate(l.created_at)]
           .map(esc)
           .join(","),
+      );
+    } else if (tab === "waitlist") {
+      head = ["Status", "Name", "Email", "Organization", "What can Juice AI do for you?", "Date"];
+      body = waitlistRows.map((l) =>
+        [l.status, l.name, l.email, l.organization, l.message ?? "", fmtDate(l.created_at)].map(esc).join(","),
       );
     } else {
       head = ["Status", "Name", "Phone", "Email", "Organization", "Score", "Archetype", "Dimension scores", "Date"];
@@ -624,6 +824,7 @@ export default function AdminLeads() {
     setPass("");
     setLeads([]);
     setCmoLeads([]);
+    setWaitlistLeads([]);
   };
 
   /* ---- password gate ---- */
@@ -660,6 +861,7 @@ export default function AdminLeads() {
   const TABS: { key: TabKey; label: string; count: number }[] = [
     { key: "redeem", label: "Redeem leads", count: leads.length },
     { key: "cmo", label: "CMO Handbook leads", count: cmoLeads.length },
+    { key: "waitlist", label: "Waitlist leads", count: waitlistLeads.length },
   ];
 
   /* ---- leads tables ---- */
@@ -703,7 +905,13 @@ export default function AdminLeads() {
             Export CSV
           </button>
           <button
-            onClick={() => (tab === "redeem" ? setModal({ open: true, lead: null }) : setCmoModal({ open: true, lead: null }))}
+            onClick={() =>
+              tab === "redeem"
+                ? setModal({ open: true, lead: null })
+                : tab === "cmo"
+                  ? setCmoModal({ open: true, lead: null })
+                  : setWaitlistModal({ open: true, lead: null })
+            }
             className="h-10 rounded-full bg-[#7c54d6] px-4 font-display text-[14px] font-bold text-white transition hover:bg-[#6a45c2]"
           >
             + Add lead
@@ -803,7 +1011,7 @@ export default function AdminLeads() {
                 )}
               </tbody>
             </table>
-          ) : (
+          ) : tab === "cmo" ? (
             <table className="w-full min-w-[940px] border-collapse text-left">
               <thead>
                 <tr className="border-b border-black/5 bg-[#faf9ff]">
@@ -861,6 +1069,60 @@ export default function AdminLeads() {
                 )}
               </tbody>
             </table>
+          ) : (
+            <table className="w-full min-w-[940px] border-collapse text-left">
+              <thead>
+                <tr className="border-b border-black/5 bg-[#faf9ff]">
+                  {WAITLIST_COLUMNS.map((c) => (
+                    <th key={c.key} className="px-5 py-3.5">
+                      <button onClick={() => toggleWaitlistSort(c.key)} className="flex items-center gap-1.5 font-display text-[13px] font-semibold uppercase tracking-wide text-[#888] transition hover:text-[#555]">
+                        {c.label}
+                        <span className={`text-[10px] ${waitlistSortKey === c.key ? "text-[#7c54d6]" : "text-transparent"}`}>
+                          {waitlistSortKey === c.key && waitlistSortDir === "asc" ? "▲" : "▼"}
+                        </span>
+                      </button>
+                    </th>
+                  ))}
+                  <th className="px-5 py-3.5 font-display text-[13px] font-semibold uppercase tracking-wide text-[#888]">What can Juice AI do for you?</th>
+                  <th className="px-5 py-3.5 text-right font-display text-[13px] font-semibold uppercase tracking-wide text-[#888]">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {waitlistRows.map((l) => (
+                  <tr key={l.id} className="border-b border-black/[0.04] transition hover:bg-[#faf9ff]">
+                    <td className="px-5 py-3">
+                      <StatusSelect value={l.status} onChange={(s) => setWaitlistStatus(l.id, s)} />
+                    </td>
+                    <td className="whitespace-nowrap px-5 py-3 font-display text-[14px] font-medium text-[#333]">{l.name}</td>
+                    <td className="px-5 py-3 font-display text-[14px] text-[#555]">{l.email}</td>
+                    <td className="px-5 py-3 font-display text-[14px] text-[#555]">{l.organization}</td>
+                    <td className="whitespace-nowrap px-5 py-3 font-display text-[14px] text-[#777]">{fmtDate(l.created_at)}</td>
+                    <td className="max-w-[280px] px-5 py-3 font-display text-[14px] text-[#555]">
+                      {l.message ? (
+                        <span className="line-clamp-2" title={l.message}>{l.message}</span>
+                      ) : (
+                        <span className="text-[13px] text-[#bbb]">—</span>
+                      )}
+                    </td>
+                    <td className="whitespace-nowrap px-5 py-3 text-right">
+                      <button onClick={() => setWaitlistModal({ open: true, lead: l })} className="rounded-lg px-2.5 py-1.5 font-display text-[13px] font-medium text-[#7c54d6] transition hover:bg-[#f0ecff]">
+                        Edit
+                      </button>
+                      <button onClick={() => deleteWaitlistLead(l)} className="rounded-lg px-2.5 py-1.5 font-display text-[13px] font-medium text-[#c0392b] transition hover:bg-[#fff0f0]">
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {waitlistRows.length === 0 && (
+                  <tr>
+                    <td colSpan={7} className="px-5 py-16 text-center font-display text-[15px] text-[#999]">
+                      {waitlistLeads.length === 0 ? "No waitlist leads yet." : "No leads match your filters."}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           )}
         </div>
       </main>
@@ -870,6 +1132,9 @@ export default function AdminLeads() {
       )}
       {cmoModal.open && (
         <CmoLeadModal initial={cmoModal.lead} onClose={() => setCmoModal({ open: false, lead: null })} onSave={saveCmoLead} />
+      )}
+      {waitlistModal.open && (
+        <WaitlistLeadModal initial={waitlistModal.lead} onClose={() => setWaitlistModal({ open: false, lead: null })} onSave={saveWaitlistLead} />
       )}
     </div>
   );
