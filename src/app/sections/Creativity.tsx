@@ -6,14 +6,16 @@ import {
   useScroll,
 } from "motion/react";
 import { fadeUp, revealViewport } from "../lib/motion";
-import contentImg from "../../imports/5Jun/creativity/content.png";
 import creatorsImg from "../../imports/5Jun/creativity/creators.png";
-import commerceImg from "../../imports/5Jun/creativity/commerce.png";
+import commerceImg from "../../imports/jul3/pdp.png";
 
 const DESC = "Create content across formats and creative narratives, across the funnel campaigns";
 
+// The CONTENT card shows a YouTube embed (no autoplay, starts at 24s) instead of a still.
+const CONTENT_VIDEO = "https://www.youtube.com/embed/1wmDbKmEAd8?start=24&rel=0";
+
 const CARDS = [
-  { key: "content", label: "CONTENT", img: contentImg, options: ["Hero Films", "Performance Ads", "Hygiene Content", "Social Media Content", "Integrated Campaigns"] },
+  { key: "content", label: "CONTENT", video: CONTENT_VIDEO, options: ["Hero Films", "Performance Ads", "Hygiene Content", "Social Media Content", "Integrated Campaigns"] },
   { key: "creators", label: "CREATORS", img: creatorsImg, options: ["Creator Chemistry", "On-Brand ideas and scripts", "Collab Ideas", "Brand IP"] },
   { key: "commerce", label: "COMMERCE", img: commerceImg, options: ["PDP Content", "A+ Content", "Quick Commerce Content", "Other Marketplaces"] },
 ] as const;
@@ -101,7 +103,18 @@ function Card({ card, expanded, animate }: { card: (typeof CARDS)[number]; expan
           transition={trans}
           className="overflow-hidden rounded-xl bg-[#faf9fe]"
         >
-          <img src={card.img} alt={`${card.label} examples`} className="h-full w-full object-cover" draggable={false} />
+          {"video" in card ? (
+            <iframe
+              src={card.video}
+              title={`${card.label} video`}
+              className="h-full w-full"
+              loading="lazy"
+              allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          ) : (
+            <img src={card.img} alt={`${card.label} examples`} className="h-full w-full object-cover" draggable={false} />
+          )}
         </motion.div>
       </div>
     </div>

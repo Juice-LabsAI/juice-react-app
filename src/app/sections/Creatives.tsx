@@ -1,16 +1,14 @@
 import { motion } from "motion/react";
 import { fadeUp, staggerParent, revealViewport } from "../lib/motion";
-import onbrand1 from "../../imports/5Jun/creatives/onbrand-1.webp";
-import onbrand2 from "../../imports/5Jun/creatives/onbrand-2.webp";
-import onbrand3 from "../../imports/5Jun/creatives/onbrand-3.webp";
+import onbrand1 from "../../imports/jul3/vanish.png";
+import onbrand2 from "../../imports/jul3/fabelle.png";
+import onbrand3 from "../../imports/jul3/swiss.png";
 
+// All three source images are already the card's 437/375 aspect, so a plain cover fits.
 const CARDS = [
-  // image 1 is square — fill the width (no side gaps) and crop only from the bottom
-  { img: onbrand1, label: "On Brand Creatives", fit: "object-cover object-top" },
+  { img: onbrand1, label: "On Brand Creatives", fit: "object-cover" },
   { img: onbrand2, label: "Pack and Logo Fidelity", fit: "object-cover" },
-  // image 3 is a wide UI shot — crop to just past the left sidebar so the creative
-  // preview (the "Fake 8 hours of sleep" frame) is fully visible, navbar hidden
-  { img: onbrand3, label: "Creative Control", fit: "object-cover object-[13%_center]" },
+  { img: onbrand3, label: "Creative Control", fit: "object-cover" },
 ];
 
 export default function Creatives() {

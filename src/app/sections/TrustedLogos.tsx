@@ -1,9 +1,12 @@
-import sunfeast from "../../imports/5Jun/logos/sunfeast.png";
-import reckitt from "../../imports/5Jun/logos/reckitt.png";
-import cocacola from "../../imports/5Jun/logos/cocacola.png";
-import bigbasket from "../../imports/5Jun/logos/bigbasket.png";
-import kapiva from "../../imports/5Jun/logos/kapiva.png";
-import lifelong from "../../imports/5Jun/logos/lifelong.png";
+import itc from "../../imports/jul3/logos/itc.png";
+import sunfeast from "../../imports/jul3/logos/sunfeast.png";
+import aashirvaad from "../../imports/jul3/logos/aashirvaad.png";
+import fabelle from "../../imports/jul3/logos/fabelle.png";
+import reckitt from "../../imports/jul3/logos/reckitt.png";
+import cocacola from "../../imports/jul3/logos/coca-cola.png";
+import kapiva from "../../imports/jul3/logos/kapiva.png";
+import mapro from "../../imports/jul3/logos/mapro.png";
+import lifelong from "../../imports/jul3/logos/lifelong.png";
 
 /**
  * Animation #2b — infinite logo marquee (per Figma node 1014:1581: a ~51px-tall
@@ -14,12 +17,15 @@ import lifelong from "../../imports/5Jun/logos/lifelong.png";
  * make the -50% loop seamless. CSS pauses on hover / freezes for reduced motion.
  */
 const LOGOS = [
-  { src: sunfeast, h: 46, alt: "Sunfeast" },
-  { src: reckitt, h: 34, alt: "Reckitt" },
-  { src: cocacola, h: 25, alt: "Coca-Cola" },
-  { src: bigbasket, h: 30, alt: "BigBasket" },
+  { src: itc, h: 40, alt: "ITC" },
+  { src: sunfeast, h: 42, alt: "Sunfeast" },
+  { src: aashirvaad, h: 34, alt: "Aashirvaad" },
+  { src: fabelle, h: 30, alt: "Fabelle" },
+  { src: reckitt, h: 30, alt: "Reckitt" },
+  { src: cocacola, h: 26, alt: "Coca-Cola" },
   { src: kapiva, h: 25, alt: "Kapiva" },
-  { src: lifelong, h: 25, alt: "Lifelong" },
+  { src: mapro, h: 30, alt: "Mapro" },
+  { src: lifelong, h: 24, alt: "Lifelong" },
 ];
 
 // repeat the set enough times to overflow the content column on wide screens
