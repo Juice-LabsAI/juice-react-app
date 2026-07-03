@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import logo from "../imports/juice-logo.png";
+import logo from "../imports/cmo/logo.svg";
 import { supabase } from "../lib/supabase";
 
 /**
@@ -438,6 +438,13 @@ function LeadGate({ score, archetype, dimensions, onRevealed }: {
       setErr(error ? "Something went wrong — please try again." : "Please fill in every field with valid details.");
       return;
     }
+    // Auto-download the CMO guide alongside revealing the results.
+    const a = document.createElement("a");
+    a.href = "/cmo-guide.pdf";
+    a.download = "The CMO's Guide to AI in Marketing.pdf";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
     onRevealed();
   };
 
