@@ -109,6 +109,20 @@ export default function Hero() {
 
   const trackRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const mobileVideoRef = useRef<HTMLVideoElement>(null);
+
+  // Belt-and-suspenders autoplay for the mobile hero video: nudge play() on mount
+  // and once it can play (some mobile browsers ignore the `autoplay` attribute).
+  useEffect(() => {
+    if (interactive || reduce) return;
+    const v = mobileVideoRef.current;
+    if (!v) return;
+    const tryPlay = () => v.play().catch(() => {});
+    tryPlay();
+    v.addEventListener("canplay", tryPlay);
+    return () => v.removeEventListener("canplay", tryPlay);
+  }, [interactive, reduce]);
+
   const { scrollYProgress } = useScroll({ target: trackRef, offset: ["start start", "end end"] });
   const p = useSpring(scrollYProgress, { stiffness: 60, damping: 26, restDelta: 0.0004 });
 
@@ -244,7 +258,9 @@ export default function Hero() {
     if (track) window.scrollTo({ top: track.offsetTop + track.offsetHeight, behavior: "smooth" });
   };
 
-  // ---- non-interactive (mobile / reduced motion): static framed poster ----
+  // ---- non-interactive (mobile / reduced motion) ----
+  // There's no scroll-scrubbed spotlight here, so the framed video just autoplays
+  // (muted + inline, so iOS/Android allow it). Reduced-motion users keep the poster.
   if (!interactive) {
     return (
       <section className="relative overflow-hidden pt-[104px] pb-0 sm:pt-[116px]">
@@ -252,7 +268,22 @@ export default function Hero() {
           <Headline className="text-[clamp(2.5rem,9vw,4.5rem)]" />
           <div className="mt-9 sm:mt-12">
             <div className={FRAME}>
-              <img src={heroVideoPoster} alt={HERO_ALT} className={FRAME_INNER} draggable={false} />
+              {reduce ? (
+                <img src={heroVideoPoster} alt={HERO_ALT} className={FRAME_INNER} draggable={false} />
+              ) : (
+                <video
+                  ref={mobileVideoRef}
+                  className={FRAME_INNER}
+                  poster={heroVideoPoster}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="auto"
+                >
+                  <source src={HERO_VIDEO_SRC} type="video/mp4" />
+                </video>
+              )}
             </div>
           </div>
         </div>

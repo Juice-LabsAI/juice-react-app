@@ -44,7 +44,7 @@ export default function AgenticTeam() {
     <section id="agentic" className="bg-white py-8 sm:py-10">
       <div className="container-juice">
         {/* rounded dotted card; the dial is clipped to its bottom-right corner */}
-        <div className="dot-grid relative overflow-hidden rounded-[28px] bg-[#f6f6f6] px-6 py-14 sm:px-12 sm:py-16 lg:min-h-[560px] lg:px-[52px]">
+        <div className="dot-grid relative min-h-[440px] overflow-hidden rounded-[28px] bg-[#f6f6f6] px-6 py-14 sm:min-h-[520px] sm:px-12 sm:py-16 lg:min-h-[560px] lg:px-[52px]">
           <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={revealViewport} className="relative z-10">
             <h2 className="font-body text-[clamp(2.5rem,8.34vw,7.5rem)] font-extrabold leading-[0.9] tracking-[-0.02em] text-[#444]">
               Your agentic
@@ -57,7 +57,7 @@ export default function AgenticTeam() {
           </motion.div>
 
           {/* dial centered exactly on the card's bottom-right corner → one quadrant visible (#6) */}
-          <div className="pointer-events-none absolute bottom-0 right-0 aspect-square w-[clamp(440px,58vw,860px)] translate-x-1/2 translate-y-1/2">
+          <div className="pointer-events-none absolute bottom-0 right-0 aspect-square w-[340px] translate-x-1/2 translate-y-1/2 sm:w-[clamp(440px,58vw,860px)]">
             <motion.div className="absolute inset-0" {...spin(-1, 60)}>
               <Dial />
             </motion.div>
