@@ -7,6 +7,8 @@
   import Redeem from "./app/Redeem.tsx";
   import AdminLeads from "./app/AdminLeads.tsx";
   import CMOHandbook from "./app/CMOHandbook.tsx";
+  import TermsConditions from "./app/TermsConditions.tsx";
+  import PrivacyPolicy from "./app/PrivacyPolicy.tsx";
   import WaitlistPopup from "./app/sections/WaitlistPopup.tsx";
   import "./styles/index.css";
 
@@ -19,6 +21,8 @@
         <Route path="/redeem" element={<Redeem />} />
         <Route path="/admin-leads" element={<AdminLeads />} />
         <Route path="/CMO-Handbook" element={<CMOHandbook />} />
+        <Route path="/terms-conditions" element={<TermsConditions />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       </Routes>
       <WaitlistPopup />
     </BrowserRouter>,

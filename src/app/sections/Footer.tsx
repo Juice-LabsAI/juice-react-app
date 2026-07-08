@@ -1,3 +1,4 @@
+import { Link } from "react-router";
 import Logo from "./Logo";
 import can from "../../imports/footer-can.png";
 import { openWaitlist } from "../../lib/waitlist";
@@ -55,8 +56,8 @@ export default function Footer({ lowCan = false }: { lowCan?: boolean }) {
             ))}
           </div>
           <div className="flex gap-8 font-display text-base text-white/80">
-            <a href="https://www.juicelabs.ai/privacy-policy" target="_blank" rel="noreferrer" className="transition-colors hover:text-white">Privacy Policy</a>
-            <a href="https://www.juicelabs.ai/terms-conditions" target="_blank" rel="noreferrer" className="transition-colors hover:text-white">Terms of Service</a>
+            <Link to="/privacy-policy" className="transition-colors hover:text-white">Privacy Policy</Link>
+            <Link to="/terms-conditions" className="transition-colors hover:text-white">Terms of Service</Link>
           </div>
           <div className="flex flex-col gap-1 font-display text-[13px] text-white/50 lg:items-end">
             <span>juicelabs.ai 2025 @ All Rights Reserved.</span>
