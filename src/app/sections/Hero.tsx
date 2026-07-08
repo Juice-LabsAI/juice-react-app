@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "motion/react";
+import { animate, motion, useReducedMotion, useScroll, useSpring, useTransform } from "motion/react";
 import heroVideoPoster from "../../imports/hero-v1-poster.png";
 
 // The hero video lives at public/hero.mp4 (served at /hero.mp4) — a raw motion
@@ -18,6 +18,11 @@ const RISE_END = 0.34; // peek → rest at the navbar
 const EXPAND_END = 0.54; // rest → full-viewport spotlight (video autoplays / holds here)
 const SHRINK_END = 0.82; // spotlight → back down to the normal card size as you scroll on
 const REARM_BELOW = 0.2; // once clear of the spotlight, stickiness re-arms
+// Snap thresholds: scroll grows/shrinks the frame manually for the first 25%, then it
+// auto-completes the remaining 75% (the spring animates it once we jump scroll to the
+// phase end). 25% of the grow range, and 25% of the shrink range.
+const GROW_SNAP_AT = RISE_END + 0.25 * (EXPAND_END - RISE_END); // 0.39
+const SHRINK_SNAP_AT = EXPAND_END + 0.25 * (SHRINK_END - EXPAND_END); // 0.61
 const SKIP_SCROLL = 2200; // px of extra scrolling needed to break out while it plays
 const SETTLE_MS = 750; // ignore the entering scroll's momentum this long before counting an escape
 const HOLD_TIMEOUT = 130000; // ms — fallback release if the video's duration is unknown
@@ -129,7 +134,7 @@ export default function Hero() {
   // Frame morph: peek → rest at navbar → full-viewport spotlight → back to card.
   // The spotlight grows (RISE_END→EXPAND_END) and then shrinks back to the normal
   // card size (EXPAND_END→SHRINK_END) as you scroll on toward the next section.
-  const frameTop = useTransform(p, [0, RISE_END, EXPAND_END, SHRINK_END], [vp.h * 0.8, NAV_TOP, 0, NAV_TOP]);
+  const frameTop = useTransform(p, [0, RISE_END, EXPAND_END, SHRINK_END], [vp.h * 0.7, NAV_TOP, 0, NAV_TOP]);
   const frameLeft = useTransform(p, [RISE_END, EXPAND_END, SHRINK_END], [centeredX, 0, centeredX]);
   const frameW = useTransform(p, [RISE_END, EXPAND_END, SHRINK_END], [cardW, vp.w, cardW]);
   const frameH = useTransform(p, [RISE_END, EXPAND_END, SHRINK_END], [cardH, vp.h, cardH]);
@@ -160,11 +165,30 @@ export default function Hero() {
 
     let settleUntil = 0;
     let playStarted = false;
+    let reachedSpotlight = false; // frame has finished growing to the full spotlight
+    let snapCtrl: ReturnType<typeof animate> | null = null;
+
+    // Drive the window scroll to a phase boundary and re-assert it every frame — a
+    // single scrollTo can be overridden by trackpad momentum, so the frame would
+    // never reach the target. scrollYProgress → spring p → the frame follows.
+    const snapScroll = (progress: number) => {
+      const track = trackRef.current;
+      if (!track) return;
+      const target = track.offsetTop + progress * (track.offsetHeight - window.innerHeight);
+      snapCtrl?.stop();
+      snapCtrl = animate(window.scrollY, target, {
+        duration: 0.55,
+        ease: [0.33, 1, 0.68, 1],
+        onUpdate: (y) => window.scrollTo(0, y),
+      });
+    };
 
     const releaseHold = () => {
       lockedRef.current = false;
       accumRef.current = 0;
       playStarted = false;
+      reachedSpotlight = false;
+      snapCtrl?.stop();
       setPlaying(false);
       if (holdTimer.current) clearTimeout(holdTimer.current);
       window.removeEventListener("wheel", onWheel);
@@ -208,10 +232,11 @@ export default function Hero() {
     };
     const engageHold = () => {
       lockedRef.current = true;
+      reachedSpotlight = false;
       accumRef.current = 0;
       settleUntil = Date.now() + SETTLE_MS;
-      const track = trackRef.current;
-      if (track) window.scrollTo(0, track.offsetTop + EXPAND_END * (track.offsetHeight - window.innerHeight));
+      // Snap the remaining 75% of the grow to the full spotlight.
+      snapScroll(EXPAND_END);
       window.addEventListener("wheel", onWheel, { passive: false });
       window.addEventListener("touchmove", onTouchMove, { passive: false, capture: true });
       window.addEventListener("keydown", onKey, true);
@@ -222,17 +247,36 @@ export default function Hero() {
     v.addEventListener("ended", onEnded);
     v.addEventListener("error", onError);
 
+    // Instant jump (used for the exit shrink — the user is already scrolling down, so
+    // re-asserting would fight them; overshooting past SHRINK_END just lands on the card).
+    const snapTo = (progress: number) => {
+      const track = trackRef.current;
+      if (track) window.scrollTo(0, track.offsetTop + progress * (track.offsetHeight - window.innerHeight));
+    };
+
+    let lastVal = 0;
     const stop = scrollYProgress.on("change", (val) => {
+      const prev = lastVal;
+      lastVal = val;
       if (lockedRef.current) {
-        if (val < EXPAND_END - 0.1) {
+        // Only allow the scroll-up "reverse out" once the spotlight is fully reached —
+        // otherwise the momentum passing through 0.39-0.44 during the grow-snap would
+        // immediately release the lock before it finishes snapping.
+        if (reachedSpotlight && val < EXPAND_END - 0.1) {
           releaseHold();
           v.pause();
           v.currentTime = 0;
         }
         return;
       }
-      if (!playedRef.current && val >= EXPAND_END) {
+      if (!playedRef.current && val >= GROW_SNAP_AT) {
+        // grown past 25% → engageHold snaps scroll to the spotlight (animated so it
+        // beats momentum) and the frame grows the remaining 75%, then the video plays.
         engageHold();
+      } else if (playedRef.current && prev < SHRINK_SNAP_AT && val >= SHRINK_SNAP_AT && val < SHRINK_END) {
+        // exit: shrunk past 25% (scrolling down) → snap the remaining 75% back to the card.
+        // Guarded to the downward crossing so scrolling back up isn't yanked down again.
+        snapTo(SHRINK_END);
       } else if (playedRef.current && val < REARM_BELOW) {
         playedRef.current = false;
       }
@@ -240,6 +284,7 @@ export default function Hero() {
     const stopP = p.on("change", (val) => {
       // Enlarged (above card size) → lift above the navbar; shrunk back → drop below it.
       setExpanded(val > RISE_END + 0.015 && val < SHRINK_END - 0.01);
+      if (lockedRef.current && val >= EXPAND_END - 0.02) reachedSpotlight = true;
       if (lockedRef.current && !playStarted && val >= EXPAND_END - 0.01) startPlayback();
     });
 
@@ -265,7 +310,7 @@ export default function Hero() {
     return (
       <section className="relative overflow-hidden pt-[104px] pb-0 sm:pt-[116px]">
         <div className="container-juice">
-          <Headline className="text-[clamp(2.5rem,9vw,4.5rem)]" />
+          <Headline className="text-[clamp(2.25rem,8.1vw,4.05rem)]" />
           <div className="mt-9 sm:mt-12">
             <div className={FRAME}>
               {reduce ? (
@@ -301,7 +346,7 @@ export default function Hero() {
         {/* Title layer — floats up and fades as the frame rises over it. */}
         <motion.div className="absolute inset-0 z-10 flex items-start" style={{ y: titleY, opacity: titleOpacity }}>
           <div className="container-juice pt-[clamp(120px,16vh,220px)]">
-            <Headline className="text-[clamp(3rem,9.5vw,8.5rem)]" />
+            <Headline className="text-[clamp(2.7rem,8.55vw,7.65rem)]" />
           </div>
         </motion.div>
 
