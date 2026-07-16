@@ -1,0 +1,30 @@
+{
+  "runId": "2026-07-16-integrated-campaigns",
+  "route": "CREATE",
+  "target": {
+    "name": "Integrated Campaigns",
+    "urlPath": "/integrated-campaigns",
+    "sourcePath": "src/app/IntegratedCampaigns.tsx (planned)"
+  },
+  "inputs": {
+    "copy": "PENDING — user has final copy ready, not yet delivered",
+    "layoutIntent": "PENDING — not yet provided",
+    "interactions": "PENDING — default = replicate existing pages' hovers/animations unless specified",
+    "links": "PENDING — nav/footer linking not yet specified"
+  },
+  "config": {
+    "confirmedByUser": "2026-07-16",
+    "shipMode": "feature-branch + PR (branch page/integrated-campaigns)"
+  },
+  "phases": {
+    "phase0": "in_progress — awaiting copy + layout/interaction/link inputs",
+    "setup": "config.json written 2026-07-16",
+    "phase1": "complete — style-contract.md written at sourceCommit 6dbafa6, 7 conflicts logged (pages won)",
+    "phase2": "pending — novelty vs existing section patterns to be assessed once layout intent is known",
+    "phase3": "pending",
+    "phase4": "pending",
+    "phase5": "pending",
+    "phase6": "pending",
+    "phase7": "not requested"
+  }
+}

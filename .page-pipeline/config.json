@@ -1,0 +1,58 @@
+{
+  "repo": {
+    "path": "/home/claude/juice-react-app",
+    "userLocalPath": "/Users/macbook/Documents/Claude/Projects/Juice website/juice-react-app",
+    "remote": "https://github.com/Juice-LabsAI/juice-react-app",
+    "defaultBranch": "main"
+  },
+  "stack": {
+    "framework": "react-18 + vite-6 + react-router-7",
+    "styling": "tailwind-v4 (tokens via @theme in src/styles/theme.css; entry src/styles/index.css)",
+    "pagesDir": "src/app",
+    "routesFile": "src/main.tsx",
+    "stylePaths": ["src/styles/"]
+  },
+  "publishedPages": [
+    { "name": "landing",   "url": "https://www.juicelabs.ai/",          "sourcePath": "src/app/App.tsx" },
+    { "name": "d2c",       "url": "https://www.juicelabs.ai/d2c",       "sourcePath": "src/app/D2C.tsx" },
+    { "name": "quick-ads", "url": "https://www.juicelabs.ai/quick-ads", "sourcePath": "src/app/QuickAds.tsx" }
+  ],
+  "designSystem": {
+    "bundlePath": "/root/.claude/skills/juice-page-pipeline/assets/juice-ai-design",
+    "localPath": "/root/.claude/skills/juice-page-pipeline/assets/juice-ai-design",
+    "landingSnapshot": "/root/.claude/skills/juice-page-pipeline/assets/Juice_AI_Landing_Page.html"
+  },
+  "brand": {
+    "fonts": [
+      { "family": "Rethink Sans",  "role": "body (--font-body)",     "source": "google-fonts" },
+      { "family": "Space Grotesk", "role": "display (--font-display)", "source": "google-fonts" },
+      { "family": "Manrope",       "role": "UI",                     "source": "google-fonts" },
+      { "family": "Inter",         "role": "chips/tabs",             "source": "google-fonts" }
+    ],
+    "fontsNote": "Codebase loads these via src/styles/fonts.css (plus Anton, Plus Jakarta Sans, PT Serif, Archivo, Bowlby One). Codebase wins over DS bundle.",
+    "assetsDir": "public/ (favicons, hero.mp4, og-image) + src/imports/ (per-page Figma-exported assets)"
+  },
+  "breakpoints": [
+    { "name": "mobile",  "width": 375 },
+    { "name": "tablet",  "width": 768 },
+    { "name": "desktop", "width": 1440 }
+  ],
+  "breakpointsNote": "Tailwind v4 defaults (sm 640 / md 768 / lg 1024 / xl 1280 / 2xl 1536); review widths confirmed by user 2026-07-16.",
+  "devServer": {
+    "command": "npm run dev",
+    "port": 5173,
+    "url": "http://localhost:5173"
+  },
+  "git": {
+    "remote": "https://github.com/Juice-LabsAI/juice-react-app",
+    "branchPattern": "page/<slug>",
+    "commitStyle": "short imperative, sentence case, no prefix (mirrors repo log)",
+    "shipMode": "feature-branch + PR"
+  },
+  "figma": {
+    "target": "https://www.figma.com/design/gEjo6aaeHs9WpF4vI1rYWQ/Juice-Landing-page?node-id=1159-136",
+    "note": "Phase 7 mirrors go into this file's parent project"
+  },
+  "review": { "approver": "user (wozniak)", "feedbackModes": "any" },
+  "interactions": "default: replicate existing pages' hovers/animations; new ones per run request"
+}
