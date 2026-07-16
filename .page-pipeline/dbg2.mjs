@@ -1,0 +1,13 @@
+import puppeteer from 'puppeteer-core';
+const browser = await puppeteer.launch({ executablePath: '/opt/pw-browsers/chromium', headless: 'new', args: ['--no-sandbox', '--blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4'] });
+const page = await browser.newPage();
+await page.setViewport({ width: 1440, height: 900 });
+await page.goto('http://localhost:5173/integrated-campaigns', { waitUntil: 'networkidle0' });
+await new Promise(r => setTimeout(r, 700));
+const probe = (sel) => page.evaluate(s => { const e = document.querySelector(s); const cs = getComputedStyle(e); return `hover=${e.matches(':hover')} scale=${cs.scale} bg=${cs.backgroundColor}`; }, sel);
+const move = async (sel) => { const b = await (await page.$(sel)).boundingBox(); await page.mouse.move(b.x + b.width/2, b.y + b.height/2); await new Promise(r => setTimeout(r, 400)); };
+await move('main button');            console.log('btn #1  :', await probe('main button'));
+await move('a[href="https://app.juicelabs.ai"]'); console.log('link    :', await probe('a[href="https://app.juicelabs.ai"]'));
+await move('main button');            console.log('btn #2  :', await probe('main button'));
+console.log('mq:', await page.evaluate(() => `hover:${matchMedia('(hover: hover)').matches} any:${matchMedia('(any-hover: hover)').matches}`));
+await browser.close();

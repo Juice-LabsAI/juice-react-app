@@ -1,0 +1,20 @@
+import puppeteer from 'puppeteer-core';
+const OUT = '/home/claude/juice-react-app/.page-pipeline/runs/2026-07-16-integrated-campaigns/screenshots/iter-1';
+const FS = '/@fs/home/claude/juice-react-app/node_modules/@fontsource';
+const FONT_CSS = `@import url('${FS}/rethink-sans/500.css');@import url('${FS}/rethink-sans/800.css');@import url('${FS}/space-grotesk/400.css');@import url('${FS}/space-grotesk/500.css');@import url('${FS}/space-grotesk/700.css');`;
+const browser = await puppeteer.launch({ executablePath: '/opt/pw-browsers/chromium', headless: false, args: ['--no-sandbox'] });
+const page = await browser.newPage();
+await page.setViewport({ width: 768, height: 1024 });
+await page.goto('http://localhost:5173/integrated-campaigns', { waitUntil: 'networkidle0' });
+await page.addStyleTag({ content: FONT_CSS });
+await page.evaluate(() => document.fonts.ready);
+await new Promise(r => setTimeout(r, 800));
+await page.screenshot({ path: `${OUT}/tablet-hero-viewport.png` });
+const h1 = await page.evaluate(() => {
+  const h = document.querySelector('main h1');
+  const r = h.getBoundingClientRect();
+  const nav = document.querySelector('header').getBoundingClientRect();
+  return `h1 top=${Math.round(r.top)} navBottom=${Math.round(nav.bottom)} overlap=${r.top < nav.bottom}`;
+});
+console.log(h1);
+await browser.close();

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WIREFRAME — /integrated-campaigns (greyscale direction artifact, NOT a design)</title>
+<style>
+  /* Deliberately un-designed: greyscale, one generic font, no brand styling. */
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: Arial, Helvetica, sans-serif; color:#222; background:#fff; }
+  .note { background:#eee; border:1px dashed #999; color:#555; font-size:11px; padding:4px 8px; margin-bottom:14px; display:inline-block; text-transform:uppercase; letter-spacing:.08em; }
+  section { max-width:1200px; margin:0 auto; padding:64px 40px; border-bottom:1px solid #ddd; }
+  .band { max-width:none; background:#f2f2f2; }
+  .band .inner { max-width:1200px; margin:0 auto; }
+  .eyebrow { font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:#777; margin-bottom:12px; font-weight:bold; }
+  h1 { font-size:72px; line-height:.95; font-weight:800; letter-spacing:-.01em; max-width:14ch; }
+  h2 { font-size:40px; line-height:1.1; font-weight:700; max-width:20ch; margin-bottom:16px; }
+  h2.giant { font-size:76px; line-height:.95; font-weight:800; max-width:12ch; }
+  .sub { font-size:18px; line-height:1.45; color:#555; max-width:60ch; margin-top:18px; }
+  .split { display:flex; gap:48px; align-items:flex-start; }
+  .split > * { flex:1; }
+  .btnrow { display:flex; gap:14px; margin-top:28px; }
+  .btn { border-radius:999px; padding:14px 28px; font-weight:bold; font-size:15px; }
+  .btn.primary { background:#333; color:#fff; }
+  .btn.secondary { background:#fff; color:#333; border:1px solid #333; }
+  .trust { margin-top:36px; font-size:13px; color:#888; border-top:1px solid #ddd; padding-top:16px; }
+  .ph { background:#e4e4e4; border:1px dashed #aaa; display:flex; align-items:center; justify-content:center; color:#888; font-size:12px; text-transform:uppercase; letter-spacing:.05em; }
+  .cards { display:grid; gap:16px; margin-top:32px; }
+  .card { background:#f5f5f5; border-radius:12px; padding:28px; }
+  .card h3 { font-size:20px; margin-bottom:8px; }
+  .card p { font-size:14px; line-height:1.45; color:#555; }
+  .quote { font-size:24px; line-height:1.3; font-weight:600; max-width:32ch; margin:40px auto 0; text-align:center; }
+  .quote cite { display:block; font-size:13px; color:#888; margin-top:12px; font-style:normal; }
+  .steps { display:grid; grid-template-columns:repeat(4,1fr); gap:0; margin-top:40px; border-top:1px solid #ccc; }
+  .step { padding:28px 20px 0 0; border-right:1px solid #ccc; }
+  .step:last-child { border-right:none; }
+  .stepnum { font-size:40px; font-weight:800; color:#bbb; }
+  .chips { display:flex; flex-wrap:wrap; gap:10px; margin-top:24px; }
+  .chip { border:1px solid #bbb; border-radius:999px; padding:8px 16px; font-size:13px; color:#555; }
+  footer { background:#d8d8d8; border-radius:32px 32px 0 0; padding:80px 40px; text-align:center; color:#666; }
+</style>
+</head>
+<body>
+
+<!-- S1 HERO — typographic hero (quick-ads pattern): giant H1 left, sub right-bottom -->
+<section>
+  <div class="note">S1 · Hero — typographic-hero pattern (like /quick-ads)</div>
+  <div class="eyebrow">Integrated Campaigns</div>
+  <div class="split" style="align-items:flex-end">
+    <h1>One brief in. A whole campaign out.</h1>
+    <div>
+      <p class="sub">Juice takes a single brief and builds the campaign around it. A core idea, 20+ pieces of content, sized for the audiences and formats you actually need. Ready to produce in minutes.</p>
+      <div class="btnrow"><span class="btn primary">Book a demo</span><span class="btn secondary">See it on your brief</span></div>
+    </div>
+  </div>
+  <p class="trust">Engineered on the anatomy of award-winning campaigns &nbsp;·&nbsp; 80+ signals per idea &nbsp;·&nbsp; Tuned by teams that have won at Cannes and Effies</p>
+</section>
+
+<!-- S2 POSITIONING — split brand statement (Jam pattern): heading left, prose right -->
+<section>
+  <div class="note">S2 · Positioning — split-statement pattern (like Jam)</div>
+  <div class="split">
+    <h2>Most “integrated” campaigns aren’t. They’re assembled.</h2>
+    <div class="sub">
+      <p>A hero film in one room. A performance set in another. A creator brief sitting on someone’s desktop… Three weeks later the campaign ships, and the story has already drifted.</p>
+      <p style="margin-top:14px">Integrated used to mean everything ran with the same font…</p>
+      <p style="margin-top:14px"><strong>Juice plans the whole campaign as one thing.</strong> One core bet, sequenced across everywhere the idea has to travel, one click from asset.</p>
+    </div>
+  </div>
+</section>
+
+<!-- S3 MANIFESTO — NEW pattern: full-width band, hero-scale type, 3 columns, board visual, pull quote -->
+<section class="band">
+  <div class="inner">
+    <div class="note">S3 · Manifesto band — NEW pattern: hero-scale type, whitespace, full-bleed board visual</div>
+    <h2 class="giant" style="text-align:center; margin:40px auto 8px">Content. Creators. Commerce.</h2>
+    <p class="sub" style="text-align:center; margin:8px auto 0">This is what integrated was supposed to mean.</p>
+    <p class="sub" style="margin:36px auto 0; text-align:center">Three teams. Three timelines. Three tools. Three approvers… Juice runs all three in one plan.</p>
+    <div class="cards" style="grid-template-columns:repeat(3,1fr)">
+      <div class="card"><h3>Content</h3><p>carries the idea. The hook people forward. The meme they steal. The line they still repeat six months later.</p></div>
+      <div class="card"><h3>Creators</h3><p>carry the credibility. The category insiders, the everyday users, the ones who make it feel true instead of sold.</p></div>
+      <div class="card"><h3>Commerce</h3><p>carries the conversion. The PDP, the Amazon A+, the WhatsApp reminder, the shelf-facing static that closes the pack.</p></div>
+    </div>
+    <div class="ph" style="height:360px; margin-top:32px">full-bleed product board visual</div>
+    <p class="sub" style="margin:28px auto 0; text-align:center">Most tools give you one of the three… Juice was built to plan all three off the same idea, tagged on the same board.</p>
+    <blockquote class="quote">“First time our brand, performance, and D2C teams have looked at the same campaign board.”<cite>— VP Marketing, D2C beauty brand</cite></blockquote>
+  </div>
+</section>
+
+<!-- S4 WHAT COMES OUT — feature grid (Features pattern): H2 + 5 items -->
+<section>
+  <div class="note">S4 · What comes out — icon-feature-grid pattern (like Features)</div>
+  <h2>A brief goes in. A campaign board comes out.</h2>
+  <p class="sub">Not a moodboard. A plan you can walk your team through on a Monday.</p>
+  <div class="cards" style="grid-template-columns:repeat(3,1fr)">
+    <div class="card"><h3>Strategic angles, not just variations</h3><p>Three or four ways to attack the brief… You pick the bet you’ll back.</p></div>
+    <div class="card"><h3>Every card has a job</h3><p>Plant a belief. Spark attention. Keep the argument going. Close the sale.</p></div>
+    <div class="card"><h3>20+ pieces per campaign</h3><p>Reels, statics, carousels, threads, AR filters… All off the same idea.</p></div>
+    <div class="card"><h3>Audience-aware storylines</h3><p>Each card is written for the segment it’s for.</p></div>
+    <div class="card"><h3>One click from asset</h3><p>Click any card, get the asset. Refine in the canvas. Push to production.</p></div>
+  </div>
+</section>
+
+<!-- S5 HOW IT WORKS — divided step grid (d2c Steps pattern), 4 steps -->
+<section>
+  <div class="note">S5 · How it works — divided-step-grid pattern (like /d2c Steps)</div>
+  <h2>Brief to board in four steps.</h2>
+  <div class="steps">
+    <div class="step"><div class="stepnum">01</div><h3>Drop the brief</h3><p class="sub" style="font-size:14px">Objective, audience, market, product, voice. Or plug in your Brand OS.</p></div>
+    <div class="step"><div class="stepnum">02</div><h3>Pick a core idea</h3><p class="sub" style="font-size:14px">Strategic angles built on fresh insight. Pick the one worth betting on.</p></div>
+    <div class="step"><div class="stepnum">03</div><h3>See the full plan</h3><p class="sub" style="font-size:14px">20+ cards, each carrying a role, an audience, a format, and a metric.</p></div>
+    <div class="step"><div class="stepnum">04</div><h3>Generate the assets</h3><p class="sub" style="font-size:14px">Click a card, get the finished asset, iterate until it’s shippable.</p></div>
+  </div>
+</section>
+
+<!-- S6 HOW IDEAS SPREAD — intro prose + 4 job cards + closing prose -->
+<section class="band">
+  <div class="inner">
+    <div class="note">S6 · How ideas spread — NEW composition: prose + four-job card row (echoes Stats card band)</div>
+    <h2>Ideas don’t move in straight lines anymore. Neither should your plan.</h2>
+    <p class="sub">The funnel diagram made sense when a 9pm TV spot did most of the work… Juice plans for how ideas actually travel. Every card on the board carries one of four jobs.</p>
+    <div class="cards" style="grid-template-columns:repeat(4,1fr)">
+      <div class="card"><h3>Seed</h3><p>Plant a belief before anyone’s watching for a pitch.</p></div>
+      <div class="card"><h3>Spark</h3><p>The moment people notice. Hero films, launch drops, meme formats.</p></div>
+      <div class="card"><h3>Engage</h3><p>Turn noticing into sharing, arguing, and building on.</p></div>
+      <div class="card"><h3>Convert</h3><p>Close the loop, wherever it happens. PDPs, A+, retention DMs.</p></div>
+    </div>
+    <p class="sub" style="margin-top:28px">A card can play more than one role… The board shows you where your idea might land, where it might start over, and where it’s likely to ricochet. On purpose, not by accident.</p>
+  </div>
+</section>
+
+<!-- S7 SPARRING PARTNER — split statement + pull quote in grey card -->
+<section>
+  <div class="note">S7 · Sparring partner — split statement + pull quote</div>
+  <div class="split">
+    <h2>A partner, not a prompt box.</h2>
+    <div>
+      <p class="sub">Ask Juice to make the angle more Gen Z. To drop a segment. To rewrite the board around a launch date. To push back if the plan feels too safe…</p>
+      <blockquote class="quote" style="text-align:left; margin:28px 0 0">“I feel like I’m sparring with a sharp creative mind, not another ChatGPT output.”</blockquote>
+    </div>
+  </div>
+</section>
+
+<!-- S8 FORMATS — chip/category rows -->
+<section>
+  <div class="note">S8 · Formats & channels — chip rows grouped by category</div>
+  <h2>Every format your campaign is going to need.</h2>
+  <div class="chips">
+    <span class="chip"><b>Video</b> · TVCs · pre-roll · bumpers · Reels · Shorts · TikTok</span>
+    <span class="chip"><b>Static</b> · feed · story · print · OOH · retail</span>
+    <span class="chip"><b>Carousel</b> · IG · LinkedIn · PDP explainers</span>
+    <span class="chip"><b>Long form</b> · LinkedIn · X · blog · email</span>
+    <span class="chip"><b>Creator</b> · briefs · drop calendars · UGC · macro Lives</span>
+    <span class="chip"><b>Interactive</b> · AR filters · quizzes · chatbots · challenges</span>
+    <span class="chip"><b>Commerce</b> · PDPs · Amazon A+ · WhatsApp · retention DMs</span>
+    <span class="chip"><b>Community</b> · FB groups · superfan lists · referral loops</span>
+  </div>
+</section>
+
+<!-- S9 WHY TEAMS SWITCH — watermark display card (AgenticTeam pattern) -->
+<section>
+  <div class="note">S9 · Why teams switch — display-card pattern (like AgenticTeam)</div>
+  <div class="card" style="padding:64px">
+    <h2 class="giant" style="font-size:56px">Variation reveals. Optimisation scales. In that order.</h2>
+    <p class="sub">Most AI ad tools return variations of an asset… Juice returns variations of the bet. Once you know which bet is working, then you scale.</p>
+  </div>
+</section>
+
+<!-- S10 SOCIAL PROOF — NEW pattern: 3 testimonial cards -->
+<section class="band">
+  <div class="inner">
+    <div class="note">S10 · Social proof — NEW pattern: 3 testimonial cards</div>
+    <div class="cards" style="grid-template-columns:repeat(3,1fr)">
+      <div class="card"><p>“With Juice, our process went from weeks to minutes without losing rigour… Clear go/no-go signals, sharp hypotheses for improvement.”</p><h3 style="font-size:14px; margin-top:16px">Vivek Nauhbar — Global Lead, GenAI Transformation, Reckitt</h3></div>
+      <div class="card"><p>“It’s surprising how much clarity Juice brings within minutes. We haven’t seen that from other AI tools.”</p><h3 style="font-size:14px; margin-top:16px">Sr. Marketing Director, CPG</h3></div>
+      <div class="card"><p>“Juice made us pitch faster and sharper. It’s changed how we approach the business.”</p><h3 style="font-size:14px; margin-top:16px">Growth Lead, D2C</h3></div>
+    </div>
+  </div>
+</section>
+
+<!-- S11 UNDER THE HOOD — split statement -->
+<section>
+  <div class="note">S11 · Under the hood — split-statement pattern</div>
+  <div class="split">
+    <h2>Trained on the anatomy of winning campaigns.</h2>
+    <p class="sub">Tuned on high-performing campaigns across categories and geographies, with 80+ signals per idea… refined by teams that have won at Cannes and Effies. Every campaign that runs through Juice makes the next one smarter.</p>
+  </div>
+</section>
+
+<!-- S12 FINAL CTA — closing CTA banner (d2c CTA pattern) -->
+<section>
+  <div class="note">S12 · Final CTA — closing-banner pattern (like /d2c CTA) → then site footer</div>
+  <div class="card" style="display:flex; gap:40px; align-items:center; padding:56px">
+    <div class="ph" style="width:280px; height:200px; flex:none">imagery</div>
+    <div>
+      <h2>Bring us your brief. We’ll bring you the campaign.</h2>
+      <p class="sub">20 minutes. Your next launch. On your board.</p>
+      <div class="btnrow"><span class="btn primary">Book a demo</span><span class="btn secondary">fresh@juicelabs.ai</span></div>
+    </div>
+  </div>
+</section>
+
+<footer>site footer (existing component, purple band with can + watermark)</footer>
+
+</body>
+</html>
