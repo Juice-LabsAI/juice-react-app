@@ -1,0 +1,36 @@
+{
+  "route": "create",
+  "target": {
+    "name": "Creator plans",
+    "urlPath": "/creators",
+    "sourcePath": "src/app/Creators.tsx (+ src/app/sections/creators/*.tsx)"
+  },
+  "inputs": {
+    "copy": "verbatim from user message 2026-07-17 (14 sections: hero, positioning, creator chemistry centerpiece, complete creator plans centerpiece, cascade, speed & governance, signals, how it works, outputs, why now, three-engine callback, social proof, under the hood, final CTA)",
+    "layoutIntent": "14-section landing page; two hero-scale bold centerpieces (Sections 3 & 4); user's design notes: S3 three-panel visual (audience overlap / content DNA / pitched idea), S4 render a product-board visual (cast left, roles top, imbalance flags); Claude to place images/graphics elsewhere as fits",
+    "interactions": "default: replicate existing pages' hover/scroll/animation patterns; no bespoke interactions requested",
+    "links": {
+      "primaryCTA": "Book a demo (match existing pages' demo CTA behavior)",
+      "secondaryCTA_hero": "See it on your brief",
+      "section11": "See how Content, Creators, and Commerce fit together -> / (landing)",
+      "finalCTA_secondary": "mailto:fresh@juicelabs.ai"
+    },
+    "nav": "standalone \u2014 do NOT touch Nav/Footer",
+    "blastRadius": "new page files + route registration in src/main.tsx only"
+  },
+  "git": {
+    "branch": "page/creator-plans",
+    "shipMode": "pr"
+  },
+  "phases": {
+    "0-route": "done",
+    "setup": "done",
+    "1-contract": "done",
+    "2-direction": "done",
+    "3-build": "done",
+    "4-fidelity": "done",
+    "5-review": "gate-open",
+    "6-ship": "pending",
+    "7-figma": "skipped(not requested)"
+  }
+}

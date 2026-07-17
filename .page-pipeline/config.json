@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "repo": {
+    "path": "/home/claude/juice-react-app",
+    "remote": "https://github.com/Juice-LabsAI/juice-react-app",
+    "defaultBranch": "main",
+    "note": "Public repo cloned into the cloud workspace; user's local clone at /Users/macbook/Documents/Claude/Projects/Juice website/juice-react-app is not a connected folder."
+  },
+  "stack": {
+    "framework": "vite-react (Vite 6, React 18, react-router 7)",
+    "styling": "tailwind-v4 (CSS-first; tokens in src/styles/theme.css, base in src/styles/globals.css, fonts in src/styles/fonts.css)",
+    "pagesDir": "src/app",
+    "componentsDir": "src/app/components",
+    "sectionsDir": "src/app/sections/<page-slug>",
+    "stylePaths": ["src/styles/**"]
+  },
+  "publishedPages": [
+    { "name": "landing",   "url": "https://www.juicelabs.ai/",          "sourcePath": "src/app/App.tsx (+ src/app/sections/*.tsx)" },
+    { "name": "d2c",       "url": "https://www.juicelabs.ai/d2c",       "sourcePath": "src/app/D2C.tsx (+ src/app/sections/d2c/*.tsx)" },
+    { "name": "quick-ads", "url": "https://www.juicelabs.ai/quick-ads", "sourcePath": "src/app/QuickAds.tsx (+ src/app/sections/quick-ads/*.tsx)" }
+  ],
+  "designSystem": {
+    "bundlePath": "/root/.claude/skills/juice-page-pipeline/assets/juice-ai-design",
+    "localPath": "/root/.claude/skills/juice-page-pipeline/assets/juice-ai-design",
+    "landingSnapshot": "/root/.claude/skills/juice-page-pipeline/assets/Juice_AI_Landing_Page.html"
+  },
+  "brand": {
+    "fonts": [
+      { "family": "Rethink Sans",  "role": "display",    "source": "google-fonts", "license": "OFL" },
+      { "family": "Space Grotesk", "role": "body",       "source": "google-fonts", "license": "OFL" },
+      { "family": "Manrope",       "role": "UI",         "source": "google-fonts", "license": "OFL" },
+      { "family": "Inter",         "role": "chips/tabs", "source": "google-fonts", "license": "OFL" }
+    ],
+    "fontsNote": "src/styles/fonts.css imports these plus Anton, Plus Jakarta Sans, PT Serif, Archivo, Archivo Black, Bowlby One; codebase usage wins.",
+    "assetsDir": "src/imports (page imagery) + public (static)"
+  },
+  "breakpoints": [
+    { "name": "mobile",  "width": 390 },
+    { "name": "tablet",  "width": 768 },
+    { "name": "laptop",  "width": 1280 },
+    { "name": "desktop", "width": 1536 }
+  ],
+  "devServer": {
+    "installCommand": "npm install",
+    "command": "npm run dev",
+    "url": "http://localhost:5173"
+  },
+  "git": {
+    "branchPattern": "page/<slug>",
+    "commitStyle": "custom: plain imperative summary mirroring repo log (e.g. 'Add Terms & Conditions and Privacy Policy pages')",
+    "shipMode": "pr",
+    "prBase": "main"
+  },
+  "review": { "approver": "user (Wozniak)", "feedbackModes": "any" },
+  "interactions": "default: replicate existing pages' hovers/animations; new ones per run inputs"
+}

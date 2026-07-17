@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Creator plans — direction wireframe (greyscale, throwaway)</title>
+<style>
+  /* Deliberately greyscale + system fonts. Layout & composition only. */
+  * { box-sizing: border-box; margin: 0; }
+  body { font-family: system-ui, sans-serif; color: #333; background: #fff; line-height: 1.4; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 40px; }
+  section { padding: 64px 0; border-bottom: 1px dashed #ccc; position: relative; }
+  .tag { position: absolute; top: 8px; left: 8px; font-size: 11px; background: #eee; padding: 2px 8px; border-radius: 4px; color: #888; letter-spacing: .05em; }
+  .eyebrow { font-size: 12px; text-transform: uppercase; letter-spacing: .12em; color: #999; margin-bottom: 12px; }
+  h1 { font-size: 54px; line-height: 1.0; letter-spacing: -.02em; max-width: 17ch; }
+  h2 { font-size: 34px; line-height: 1.05; letter-spacing: -.01em; max-width: 24ch; }
+  h2.hero-scale { font-size: 58px; max-width: 15ch; }
+  .sub { font-size: 18px; color: #666; max-width: 60ch; margin-top: 16px; }
+  .center { text-align: center; } .center h1, .center h2, .center .sub { margin-left: auto; margin-right: auto; }
+  .cta-row { display: flex; gap: 12px; margin-top: 28px; } .center .cta-row { justify-content: center; }
+  .btn { border-radius: 999px; padding: 14px 26px; font-size: 15px; font-weight: 700; border: 2px solid #333; }
+  .btn.primary { background: #333; color: #fff; }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 32px; } .center .chips { justify-content: center; }
+  .chip { font-size: 13px; color: #777; border: 1px solid #ddd; border-radius: 999px; padding: 8px 16px; }
+  .ph { background: repeating-linear-gradient(45deg,#f2f2f2,#f2f2f2 12px,#e9e9e9 12px,#e9e9e9 24px); border: 1px solid #ddd; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #999; font-size: 13px; text-align: center; padding: 12px; }
+  .panel { background: #f6f6f6; border-radius: 12px; padding: 48px; }
+  .cols-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; margin-top: 40px; }
+  .cols-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 40px; align-items: start; }
+  .cols-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; margin-top: 40px; }
+  .card { border: 1px solid #ddd; border-radius: 12px; padding: 20px; background: #fff; }
+  .card h4 { font-size: 15px; margin-bottom: 6px; } .card p { font-size: 13px; color: #777; }
+  .quote { border-left: 3px solid #ccc; padding-left: 20px; font-size: 17px; color: #555; max-width: 55ch; margin: 40px auto 0; }
+  .quote .attr { font-size: 13px; color: #999; margin-top: 8px; }
+  .prose { font-size: 18px; color: #555; max-width: 62ch; margin-top: 20px; } .prose + .prose { margin-top: 14px; }
+  .dark { background: #2a2a2a; color: #eee; } .dark .sub, .dark .prose { color: #bbb; }
+  .steps { counter-reset: s; margin-top: 40px; display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; }
+  .step { border-top: 2px solid #333; padding-top: 14px; } .step::before { counter-increment: s; content: "0" counter(s); font-size: 13px; color: #999; display: block; margin-bottom: 6px; }
+  ul.plain { margin: 24px 0 0 0; padding: 0; list-style: none; } ul.plain li { padding: 10px 0; border-bottom: 1px solid #eee; font-size: 15px; color: #555; }
+  .note { font-size: 12px; color: #aaa; font-style: italic; margin-top: 16px; }
+  .board { margin-top: 36px; border: 1px solid #ddd; border-radius: 12px; overflow: hidden; }
+  .board .hd, .board .rw { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr; }
+  .board .hd div { background: #eee; font-size: 12px; font-weight: 700; padding: 10px 12px; border-left: 1px solid #ddd; }
+  .board .rw div { font-size: 12px; color: #777; padding: 12px; border-top: 1px solid #eee; border-left: 1px solid #eee; }
+  .flag { display: inline-block; background: #ddd; border-radius: 4px; padding: 2px 6px; font-size: 11px; color: #555; }
+  .cascade { display: grid; grid-template-columns: repeat(5,1fr); gap: 0; margin-top: 40px; align-items: end; }
+  .wavebar { background: #e5e5e5; border: 1px solid #ddd; border-radius: 8px 8px 0 0; display:flex; align-items:flex-end; justify-content:center; font-size: 11px; color:#888; padding: 8px; }
+</style>
+</head>
+<body>
+
+<section class="center"><span class="tag">S1 · HERO</span>
+  <div class="wrap">
+    <div class="eyebrow">Creators</div>
+    <h1>Not a creator list. A cohesive creator plan.</h1>
+    <p class="sub">Juice matches your brand with the right creators, writes ideas that fit both sides, and stages the cast across reach, region, and format…</p>
+    <div class="cta-row"><span class="btn primary">Book a demo</span><span class="btn">See it on your brief</span></div>
+    <div class="chips"><span class="chip">Trained on 100k+ creator campaigns</span><span class="chip">Reads audience overlap, watch behavior, sponsored performance</span><span class="chip">Loads your Brand OS — compliant on the first pass</span></div>
+  </div>
+</section>
+
+<section><span class="tag">S2 · POSITIONING</span>
+  <div class="wrap">
+    <h2>Most brands don't have a creator plan. They have a creator list.</h2>
+    <p class="prose">A spreadsheet. Some macro names the agency knew… (full copy)</p>
+    <p class="prose"><strong>The problem isn't the creators. It's that no one is planning them like a campaign.</strong></p>
+    <p class="note">No graphic — narrow prose column, lots of whitespace. Sets up the two centerpieces.</p>
+  </div>
+</section>
+
+<section class="center"><span class="tag">S3 · CREATOR CHEMISTRY — centerpiece #1 (extra vertical padding, hero-scale type)</span>
+  <div class="wrap">
+    <h2 class="hero-scale">Creator Chemistry.</h2>
+    <p class="sub">The right brand. The right creator. An idea both sides actually want to make.</p>
+    <p class="prose" style="margin:24px auto 0">Intro copy (3 short paragraphs)…</p>
+    <div class="cols-3">
+      <div class="card" style="text-align:left"><div class="ph" style="height:150px">GRAPHIC: audience-overlap venn / density plot</div><h4 style="margin-top:14px">The creator's audience</h4><p>Category affinity, spend signals, region, language… (full copy)</p></div>
+      <div class="card" style="text-align:left"><div class="ph" style="height:150px">GRAPHIC: content-DNA fingerprint (tone / pace / hook bars)</div><h4 style="margin-top:14px">The creator's content DNA</h4><p>Tone, pace, hook style, completion formats… (full copy)</p></div>
+      <div class="card" style="text-align:left"><div class="ph" style="height:150px">GRAPHIC: pitched-idea card in the creator's voice</div><h4 style="margin-top:14px">The idea</h4><p>Written to their content, not a brand template… (full copy)</p></div>
+    </div>
+    <p class="prose" style="margin:32px auto 0">"When the three line up…" closing paragraph.</p>
+    <div class="quote">"First creator campaign our legal team cleared on the first pass…"<div class="attr">Marketing Lead, personal care brand</div></div>
+  </div>
+</section>
+
+<section><span class="tag">S4 · COMPLETE CREATOR PLANS — centerpiece #2 (panel background, hero-scale type)</span>
+  <div class="wrap"><div class="panel">
+    <h2 class="hero-scale">Complete Creator Plans.</h2>
+    <p class="sub">Reach. Type. Region. Format. Stage. Orchestrated.</p>
+    <p class="prose">"A single creator can move a niche. A campaign needs a cast." + director/casting copy…</p>
+    <div class="board">
+      <div class="hd"><div>CAST</div><div>Reach role</div><div>Regional role</div><div>Content role</div><div>Stage role</div></div>
+      <div class="rw"><div>@derm.diaries</div><div>Micro · expert</div><div>EN · national</div><div>Demo</div><div>Proof</div></div>
+      <div class="rw"><div>@chennai.eats</div><div>Nano</div><div>Tamil · TN</div><div>Review</div><div>Regional lift</div></div>
+      <div class="rw"><div>@meme.factory</div><div>Mid</div><div>EN · national</div><div>Meme</div><div>Spread <span class="flag">⚑ stage gap: closing has no creators</span></div></div>
+    </div>
+    <p class="note">GRAPHIC: stylized product board — cast on the left, roles as columns, Juice's imbalance flags rendered inline (per your design note). Role bullet list becomes the board columns + a five-chip legend (Reach/Regional/Content/Stage/Metric).</p>
+    <p class="prose">"The board tells you when a plan is too top-heavy…" + closer.</p>
+  </div></div>
+</section>
+
+<section><span class="tag">S5 · HOW IDEAS SPREAD</span>
+  <div class="wrap">
+    <h2>One creator lights the fire. Twenty creators keep it lit.</h2>
+    <p class="prose">Wave/cascade copy…</p>
+    <div class="cascade">
+      <div class="wavebar" style="height:60px">Unboxing<br>plants it</div>
+      <div class="wavebar" style="height:110px">Specialist<br>gives it teeth</div>
+      <div class="wavebar" style="height:160px">Regional<br>translates it</div>
+      <div class="wavebar" style="height:130px">Memes<br>flatten it</div>
+      <div class="wavebar" style="height:90px">Superfan<br>closes it</div>
+    </div>
+    <p class="note">GRAPHIC: cascade/wave sequence — 5 stages left→right showing the shape of the wave, not a calendar.</p>
+  </div>
+</section>
+
+<section><span class="tag">S6 · SPEED & GOVERNANCE</span>
+  <div class="wrap">
+    <h2>Fewer approval rounds. Same brand safety.</h2>
+    <div class="cols-2">
+      <div><p class="prose">Briefs written against the creator's actual content… + closing paragraph on the three-week brief/review.</p></div>
+      <div class="card"><h4>Every idea ships with the guardrails already showing</h4>
+        <ul class="plain"><li>Ideas written against the creator's content signature</li><li>Claims tagged for substantiation & category rules</li><li>Regional variants flagged for language approvals</li><li>Brand voice, DNC list, taboos pre-loaded from Brand OS</li></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section><span class="tag">S7 · WHAT JUICE KNOWS</span>
+  <div class="wrap">
+    <h2>Follower count is a starting filter, not a decision.</h2>
+    <div class="cols-4">
+      <div class="card"><h4>Category affinity</h4><p>…</p></div><div class="card"><h4>Comment-to-view quality</h4><p>…</p></div>
+      <div class="card"><h4>Save & forward rates</h4><p>…</p></div><div class="card"><h4>Sponsored vs organic</h4><p>…</p></div>
+      <div class="card"><h4>Regional lift</h4><p>…</p></div><div class="card"><h4>Content-style fingerprint</h4><p>…</p></div>
+      <div class="card"><h4>Brand collab history</h4><p>…</p></div><div class="card"><h4>Cultural moment fit</h4><p>…</p></div>
+    </div>
+    <p class="prose">"The output is a creator match that stands up when someone in finance asks you why."</p>
+  </div>
+</section>
+
+<section><span class="tag">S8 · HOW IT WORKS</span>
+  <div class="wrap">
+    <h2>Brief to cast in four steps.</h2>
+    <div class="steps">
+      <div class="step"><h4>Drop the brief</h4><p>…</p></div><div class="step"><h4>See the chemistry map</h4><p>…</p></div>
+      <div class="step"><h4>Build the cast</h4><p>…</p></div><div class="step"><h4>Generate the briefs</h4><p>…</p></div>
+    </div>
+  </div>
+</section>
+
+<section><span class="tag">S9 · WHAT COMES OUT</span>
+  <div class="wrap"><div class="panel">
+    <h2>A creator plan you can walk into any room with.</h2>
+    <ul class="plain"><li>The cast, tagged by role and stage</li><li>A shot list per creator, written to their content style</li><li>Region and language mix, mapped against reach</li><li>Compliance flags per claim, pre-loaded per category</li><li>Metrics per creator, rolled up to a campaign KPI</li><li>The paid amplification cut</li></ul>
+  </div></div>
+</section>
+
+<section><span class="tag">S10 · WHY NOW</span>
+  <div class="wrap">
+    <h2>The category has moved past discovery tools.</h2>
+    <p class="prose">Search problem → planning problem copy. No graphic; short section.</p>
+  </div>
+</section>
+
+<section class="center"><span class="tag">S11 · CONTENT · CREATORS · COMMERCE</span>
+  <div class="wrap">
+    <h2>One engine of three.</h2>
+    <div class="chips"><span class="chip">Content — carries the idea</span><span class="chip">Creators — carry the credibility</span><span class="chip">Commerce — carries the conversion</span></div>
+    <p class="prose" style="margin:24px auto 0">Callback copy…</p>
+    <p style="margin-top:16px"><u>See how Content, Creators, and Commerce fit together →</u> (links to /)</p>
+  </div>
+</section>
+
+<section><span class="tag">S12 · SOCIAL PROOF</span>
+  <div class="wrap"><div class="cols-3">
+    <div class="card"><p>"The first creator brief we've sent out where the creator sent back a 'yes, exactly'…"</p><p class="attr" style="margin-top:10px;color:#999;font-size:12px">Head of Brand, D2C beauty</p></div>
+    <div class="card"><p>"Three tabs and a WhatsApp group → one board…"</p><p class="attr" style="margin-top:10px;color:#999;font-size:12px">Growth Lead, personal care brand</p></div>
+    <div class="card"><p>"Legal cleared the whole cast in one review…"</p><p class="attr" style="margin-top:10px;color:#999;font-size:12px">Marketing Director, CPG</p></div>
+  </div></div>
+</section>
+
+<section class="dark"><span class="tag">S13 · UNDER THE HOOD (dark band)</span>
+  <div class="wrap">
+    <h2>Trained on what actually makes creator content work.</h2>
+    <p class="prose">Model copy… two paragraphs.</p>
+  </div>
+</section>
+
+<section class="center"><span class="tag">S14 · FINAL CTA</span>
+  <div class="wrap">
+    <h2 class="hero-scale">Bring your brief. Get your cast.</h2>
+    <p class="sub">20 minutes. Your next launch. Chemistry first.</p>
+    <div class="cta-row"><span class="btn primary">Book a demo</span><span class="btn">fresh@juicelabs.ai</span></div>
+  </div>
+</section>
+
+</body>
+</html>
