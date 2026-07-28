@@ -110,6 +110,28 @@ lines, so a copy change can't silently produce a worse card.
 Verified end to end: a crawler fetch returns the card's absolute URL, and that URL
 serves a real 1200×630 `image/png` rather than falling through to the SPA.
 
+## Printed URLs removed, wordmark enlarged
+
+The report printed its own address in four places — the label beside the nav wordmark,
+`www.juicelabs.ai` under the hero byline, the same again in the footer card, and a
+`JUICELABS.AI` link in the footer fine print. All four are gone. The link targets are
+untouched: the nav wordmark, the hero card and the footer card are each still a single
+`<a>` to juicelabs.ai, so the logo and the "Juice AI" text now carry the link. Build
+asserts exactly three link targets survive, and that no URL is left as visible text.
+
+With the labels gone, the wordmark went up — nav 26→34px, hero 34→44px, footer 36→46px.
+The nav bar grows from 50 to 59px, still comfortably cleared by the header's 130px top
+padding, and losing the label gives the station links more room on narrow screens. The
+dead CSS went with it (`nav .brand span` and the `max-width:860px` rule that hid it).
+
+Identical logo sizes at all four breakpoints, no overflow, console clean.
+
+**Card render made deterministic.** Re-rendering the social card produced a 40×40px
+diff each time — the eyebrow chip flickers on a 6s loop and the capture caught it at
+different phases. The script now freezes animations before the screenshot; two
+consecutive runs are byte-identical. The committed card was regenerated from that path,
+with no change to its content.
+
 ### Still open
 
 Only this route is prerendered. `/`, `/d2c`, `/quick-ads`, `/creators` and

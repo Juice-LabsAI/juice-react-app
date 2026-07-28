@@ -48,12 +48,12 @@
     "1-style-contract": "reused \u2014 not stale (styles + published-page sources untouched since sourceCommit 6dbafa6; 11 days old). Neither POV page is site-styled; both are self-contained designs.",
     "2-direction": "skipped \u2014 the report is a verbatim port of an already-approved design, not a novel layout",
     "3-build": "done \u2014 vite build passes, zero errors",
-    "4-browser-review": "done \u2014 4 iterations, clean (iter 3 = social previews, iter 4 = wordmark sizing + social card)",
+    "4-browser-review": "done \u2014 5 iterations, clean (3 = social previews, 4 = wordmark sizing + card, 5 = URL removal + larger wordmark)",
     "5-live-review": "awaiting user approval",
     "6-ship": "script prepared, awaiting explicit go-ahead",
     "7-figma-mirror": "not requested"
   },
-  "iterations": 4,
+  "iterations": 5,
   "openIssues": [
     "only /pov/genz-india is prerendered; other routes still share the generic card"
   ],
@@ -63,8 +63,12 @@
       "what": "/pov namespace, handbook move, Gen Z report, prerendered social tags"
     },
     {
-      "commit": "pending",
+      "commit": "01e2c43",
       "what": "wordmark sizing fix, footer tagline, report social card"
+    },
+    {
+      "commit": "pending",
+      "what": "remove printed URLs, enlarge wordmark, deterministic card render"
     }
   ]
 }

@@ -35,6 +35,12 @@ const OUT = join(ROOT, "public", "pov", "genz-india-og.png");
 const TITLE_SIZE = "92px";
 
 const compose = (titleSize) => {
+  // Freeze animations. The eyebrow chip flickers on a 6s loop, so without this
+  // two runs of the script produce visibly different bytes for the same design.
+  const freeze = document.createElement("style");
+  freeze.textContent = "*,*::before,*::after{animation:none !important;transition:none !important;}";
+  document.head.appendChild(freeze);
+
   for (const sel of ["nav", "#track", ".skyline", ".hero-by", ".hero-stats",
                      "#eggToast", "#train", "#papdi", ".scroll-cue"]) {
     const el = document.querySelector(sel);

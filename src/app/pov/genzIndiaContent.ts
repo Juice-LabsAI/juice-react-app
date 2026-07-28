@@ -65,9 +65,8 @@ nav{
   border-bottom:1px solid var(--line);
 }
 nav .brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;}
-nav .brand img{height:26px;display:block;filter:drop-shadow(0 0 8px rgba(124,92,252,0.8));transition:filter .3s;}
+nav .brand img{height:34px;display:block;filter:drop-shadow(0 0 8px rgba(124,92,252,0.8));transition:filter .3s;}
 nav .brand:hover img{filter:drop-shadow(0 0 14px rgba(124,92,252,1));}
-nav .brand span{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--dim);}
 nav .stations{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;}
 nav .stations::-webkit-scrollbar{display:none;}
 nav .stations a{
@@ -77,7 +76,6 @@ nav .stations a{
 }
 nav .stations a:hover{color:var(--cyan);border-color:rgba(0,229,255,0.4);}
 nav .stations a.on{color:var(--night);background:var(--cyan);border-color:var(--cyan);box-shadow:0 0 14px rgba(0,229,255,0.5);}
-@media(max-width:860px){nav .brand span{display:none;}}
 
 /* ---------- hero ---------- */
 header{
@@ -137,7 +135,7 @@ h1.glitch.burst{animation:burst .5s steps(2) 3;}
   transition:box-shadow .25s,transform .25s;
 }
 .hero-by:hover{box-shadow:0 0 40px rgba(124,92,252,0.4);transform:translateY(-2px);}
-.hero-by img{height:34px;display:block;}
+.hero-by img{height:44px;display:block;}
 .hero-by .t{font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1.5;color:var(--ink);letter-spacing:0.05em;}
 .hero-by .t b{color:#b9a7ff;}
 .hero-stats{display:flex;gap:14px;margin-top:44px;flex-wrap:wrap;}
@@ -343,7 +341,7 @@ footer{
   transition:box-shadow .25s,transform .25s;
 }
 .foot-by:hover{box-shadow:0 0 34px rgba(124,92,252,0.4);transform:translateY(-2px);}
-.foot-by img{height:36px;}
+.foot-by img{height:46px;}
 .foot-by .t{text-align:left;font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1.6;color:var(--ink);}
 .foot-by .t b{color:#b9a7ff;}
 .foot-note{
@@ -398,7 +396,6 @@ export const GENZ_MARKUP = `
 <nav aria-label="Report stations">
   <a class="brand" href="https://www.juicelabs.ai" target="_blank" rel="noopener">
     <img src="__LOGO_SRC__" alt="Juice AI">
-    <span>juicelabs.ai</span>
   </a>
   <div class="stations">
     <a href="#prologue">00 Prologue</a>
@@ -425,7 +422,7 @@ export const GENZ_MARKUP = `
 
     <a class="hero-by" href="https://www.juicelabs.ai" target="_blank" rel="noopener">
       <img src="__LOGO_SRC__" alt="Juice AI logo">
-      <span class="t">A report by <b>Juice AI</b><br>www.juicelabs.ai</span>
+      <span class="t">A report by <b>Juice AI</b></span>
     </a>
 
     <div class="hero-stats">
@@ -916,12 +913,12 @@ export const GENZ_MARKUP = `
 
     <a class="foot-by rv" href="https://www.juicelabs.ai" target="_blank" rel="noopener">
       <img src="__LOGO_SRC__" alt="Juice AI logo">
-      <span class="t">Produced by <b>Juice AI</b> — The Brand OS that generates content that outperforms<br><b>www.juicelabs.ai</b></span>
+      <span class="t">Produced by <b>Juice AI</b> — The Brand OS that generates content that outperforms</span>
     </a>
 
     <div class="foot-note rv">
       THE FIRST GENERATION THAT DOESN'T NEED YOU · GEN Z INDIA INSIGHTS REPORT<br>
-      A BRIEFING FOR BRAND MARKETERS · <a href="https://www.juicelabs.ai" target="_blank" rel="noopener">JUICELABS.AI</a><br>
+      A BRIEFING FOR BRAND MARKETERS<br>
       <button id="hornBtn" title="?" aria-label="Sound the horn">🚈</button> &nbsp;·&nbsp; 🥚×3 hidden on this line
     </div>
   </div>
