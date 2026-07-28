@@ -15,6 +15,9 @@ Website image assets/
 # raw design-drop folder for the CMO Handbook — processed asset (logo) lives in src/imports/cmo
 # (leading slash so it only matches the repo-root folder, not src/imports/cmo)
 /CMO/
+# pipeline review evidence — kept on disk for review, too heavy to version
+.page-pipeline/runs/*/screenshots/
+
 public/*.mp4
 # …except the hero spotlight video, which Vercel serves directly (kept small, ~10MB).
 !public/hero.mp4

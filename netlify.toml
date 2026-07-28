@@ -2,6 +2,21 @@
   command = "npm run build"
   publish = "dist"
 
+# The CMO Handbook moved under /pov. Keep the old URL alive for links already
+# shared. Must stay above the SPA catch-all — Netlify uses the first match.
+[[redirects]]
+  from = "/CMO-Handbook"
+  to = "/pov/CMO-Handbook"
+  status = 301
+  force = true
+
+# Prerendered entries (see scripts/prerender-meta.mjs) carry their own social tags.
+# Must stay above the SPA catch-all so crawlers get the real file, not index.html.
+[[redirects]]
+  from = "/pov/genz-india"
+  to = "/pov/genz-india/index.html"
+  status = 200
+
 [[redirects]]
   from = "/*"
   to = "/index.html"

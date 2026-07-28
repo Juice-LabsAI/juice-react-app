@@ -1,0 +1,59 @@
+{
+  "slug": "pov-namespace",
+  "date": "2026-07-28",
+  "route": "EDIT (navigation architecture) + CREATE (1 page)",
+  "requestedBy": "Wozniak",
+  "inputs": {
+    "povIndex": "namespace only for now \u2014 /pov and /pov/* redirect to the homepage; a real index page will be designed later",
+    "legacyUrl": "/CMO-Handbook redirects to /pov/CMO-Handbook (server 301/308 + client fallback)",
+    "genzBuild": "convert to a React route",
+    "navLinks": "none yet \u2014 URLs shared directly"
+  },
+  "targets": [
+    {
+      "url": "/pov/CMO-Handbook",
+      "source": "src/app/CMOHandbook.tsx (unchanged; route moved)"
+    },
+    {
+      "url": "/pov/genz-india",
+      "source": "src/app/PovGenzIndia.tsx + src/app/pov/genzIndiaContent.ts"
+    },
+    {
+      "url": "/pov",
+      "source": "redirect to /"
+    },
+    {
+      "url": "/CMO-Handbook",
+      "source": "redirect to /pov/CMO-Handbook"
+    }
+  ],
+  "filesChanged": [
+    "src/main.tsx",
+    "vercel.json",
+    "netlify.toml",
+    ".gitignore",
+    "package.json"
+  ],
+  "filesAdded": [
+    "src/app/PovGenzIndia.tsx",
+    "src/app/pov/genzIndiaContent.ts",
+    "src/imports/pov/genz-logo.png",
+    "seo.config.mjs",
+    "scripts/prerender-meta.mjs"
+  ],
+  "phases": {
+    "0-route": "done",
+    "1-style-contract": "reused \u2014 not stale (styles + published-page sources untouched since sourceCommit 6dbafa6; 11 days old). Neither POV page is site-styled; both are self-contained designs.",
+    "2-direction": "skipped \u2014 the report is a verbatim port of an already-approved design, not a novel layout",
+    "3-build": "done \u2014 vite build passes, zero errors",
+    "4-browser-review": "done \u2014 3 iterations, clean (iter 3 = social-preview verification)",
+    "5-live-review": "awaiting user approval",
+    "6-ship": "script prepared, awaiting explicit go-ahead",
+    "7-figma-mirror": "not requested"
+  },
+  "iterations": 3,
+  "openIssues": [
+    "og:image for /pov/genz-india is still the house card \u2014 bespoke 1200x630 art deferred by choice",
+    "only /pov/genz-india is prerendered; other routes still share the generic card"
+  ]
+}
