@@ -37,23 +37,34 @@
   "filesAdded": [
     "src/app/PovGenzIndia.tsx",
     "src/app/pov/genzIndiaContent.ts",
-    "src/imports/pov/genz-logo.png",
     "seo.config.mjs",
-    "scripts/prerender-meta.mjs"
+    "scripts/prerender-meta.mjs",
+    "src/imports/pov/genz-logo.svg",
+    "public/pov/genz-india-og.png",
+    "scripts/og/render-genz-og.mjs"
   ],
   "phases": {
     "0-route": "done",
     "1-style-contract": "reused \u2014 not stale (styles + published-page sources untouched since sourceCommit 6dbafa6; 11 days old). Neither POV page is site-styled; both are self-contained designs.",
     "2-direction": "skipped \u2014 the report is a verbatim port of an already-approved design, not a novel layout",
     "3-build": "done \u2014 vite build passes, zero errors",
-    "4-browser-review": "done \u2014 3 iterations, clean (iter 3 = social-preview verification)",
+    "4-browser-review": "done \u2014 4 iterations, clean (iter 3 = social previews, iter 4 = wordmark sizing + social card)",
     "5-live-review": "awaiting user approval",
     "6-ship": "script prepared, awaiting explicit go-ahead",
     "7-figma-mirror": "not requested"
   },
-  "iterations": 3,
+  "iterations": 4,
   "openIssues": [
-    "og:image for /pov/genz-india is still the house card \u2014 bespoke 1200x630 art deferred by choice",
     "only /pov/genz-india is prerendered; other routes still share the generic card"
+  ],
+  "shipped": [
+    {
+      "commit": "7170557",
+      "what": "/pov namespace, handbook move, Gen Z report, prerendered social tags"
+    },
+    {
+      "commit": "pending",
+      "what": "wordmark sizing fix, footer tagline, report social card"
+    }
   ]
 }

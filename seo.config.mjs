@@ -27,8 +27,9 @@ export const ROUTE_META = {
     title: "The First Generation That Doesn't Need You — Gen Z India · Juice AI",
     description:
       "Understanding the Mind & Wallet of Gen Z India. A briefing for brand marketers, by Juice AI.",
-    // Bespoke card still to come — falls back to the house image for now.
-    image: "/og-image.png",
+    // 1200×630 render of the report's own hero — regenerate with
+    // `node scripts/og/render-genz-og.mjs` if the hero copy or styling changes.
+    image: "/pov/genz-india-og.png",
     type: "article",
   },
 };

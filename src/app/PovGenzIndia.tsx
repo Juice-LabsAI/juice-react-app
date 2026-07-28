@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import logoSrc from "../imports/pov/genz-logo.png";
+import logoSrc from "../imports/pov/genz-logo.svg";
 import { GENZ_CSS, GENZ_MARKUP } from "./pov/genzIndiaContent";
 // @ts-expect-error — plain-ESM config, shared with scripts/prerender-meta.mjs
 import { SITE_META, routeMeta } from "../../seo.config.mjs";

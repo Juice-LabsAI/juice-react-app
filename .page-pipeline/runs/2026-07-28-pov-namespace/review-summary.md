@@ -55,6 +55,25 @@ MAX NEON, the active nav station, and the homepage after navigating away.
 Zero horizontal overflow at every breakpoint. Zero console errors on every route.
 All 111 scroll reveals fire. All images carry alt text, one `h1`, landmarks present.
 
+## Follow-up after 7170557 — wordmark sizing + footer copy
+
+The Juice wordmark looked undersized and off-centre in all three placements. Cause:
+the base64 logo in the export was a 520×355 PNG whose mark only occupied 410×263,
+sitting 76px in from the left and 92px down from the top. Every `height:` rule was
+therefore sizing transparent padding — the visible mark came out about 30% smaller
+than asked for and pushed down-right of where it belonged.
+
+Replaced with `src/imports/pov/genz-logo.svg`: the same artwork as the site's own
+wordmark, tight viewBox, recoloured to `#874BFF` (sampled from the original raster).
+The CSS heights are untouched at 26 / 34 / 36px — removing the padding is the whole
+fix. Being vector, it's also crisp on retina, which the raster wasn't.
+
+Rendered sizes are now identical at all four breakpoints (61×26, 80×34, 84×36), all
+three load, no overflow, console clean.
+
+Footer tagline changed from "AI-native ad creative & brand intelligence" to
+"The Brand OS that generates content that outperforms".
+
 ## Social previews — fixed
 
 Crawlers fetch HTML and never run the bundle, so in a single-page app every URL handed
@@ -73,11 +92,26 @@ title and `og:url` come back, while `/` and `/pov/CMO-Handbook` correctly still 
 the house card. The build script also fails loudly if a `<meta>` it expects to override
 goes missing, so a future edit to `index.html` can't quietly break this.
 
-Two things deliberately left:
+### The card
 
-- **The image is still the house `og-image.png`.** You chose to skip a bespoke card for
-  now — the title and description are right, but the picture won't say which page it is.
-  `seo.config.mjs` has an `image` field ready for when you want one.
-- **Only this route is prerendered.** `/`, `/d2c`, `/quick-ads`, `/creators` and
-  `/pov/CMO-Handbook` still share the generic card. The mechanism now exists for all of
-  them whenever you want to write the copy.
+`public/pov/genz-india-og.png` — 1200×630, matching the `og:image:width/height` already
+declared in `index.html`. It is a render of the report's own hero (eyebrow chip,
+headline, Hindi line, subhead, briefing line) with the nav, logo card, stat cards,
+skyline and scroll cue hidden. Produced from the live page rather than drawn
+separately, so it can't drift from the design.
+
+`scripts/og/render-genz-og.mjs` regenerates it. Run by hand, not wired into the build —
+it needs a browser and the card only changes when the hero does. The headline size is
+pinned at 92px with a comment explaining why: the wrap has to land as "THE FIRST /
+GENERATION THAT / DOESN'T NEED YOU", and below ~90px it re-breaks and strands "YOU" on
+a line of its own. The script refuses to write the file if the headline isn't on three
+lines, so a copy change can't silently produce a worse card.
+
+Verified end to end: a crawler fetch returns the card's absolute URL, and that URL
+serves a real 1200×630 `image/png` rather than falling through to the SPA.
+
+### Still open
+
+Only this route is prerendered. `/`, `/d2c`, `/quick-ads`, `/creators` and
+`/pov/CMO-Handbook` still share the generic card. The mechanism covers them whenever
+the copy and art are written.

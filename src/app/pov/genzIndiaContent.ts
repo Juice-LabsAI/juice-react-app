@@ -1,11 +1,18 @@
 /**
- * Gen Z India insights report — verbatim content from the approved standalone
- * HTML export (genz-india-insights-report.html). Extracted mechanically so the
- * markup and CSS stay byte-identical to the design that was signed off; the
- * only edits are the inline base64 logo swapped for a real asset placeholder
- * (__LOGO_SRC__) and the <script> moved into PovGenzIndia.tsx.
+ * Gen Z India insights report — content from the approved standalone HTML export
+ * (genz-india-insights-report.html), extracted mechanically so the markup and CSS
+ * stay faithful to the design that was signed off.
  *
- * Do not hand-edit — regenerate from the source export if the report changes.
+ * Deliberate divergences from that export, all of them reviewed:
+ *   1. the inline base64 logo became an asset placeholder (__LOGO_SRC__), resolved
+ *      in PovGenzIndia.tsx;
+ *   2. the <script> moved into PovGenzIndia.tsx as an effect;
+ *   3. the logo is now the tight-cropped vector wordmark, so the `height:` rules
+ *      below size the mark rather than the transparent padding the PNG carried;
+ *   4. the footer tagline reads "The Brand OS that generates content that
+ *      outperforms" (requested 2026-07-28).
+ *
+ * Regenerating from the source export means re-applying these four.
  */
 
 export const GENZ_CSS = `
@@ -909,7 +916,7 @@ export const GENZ_MARKUP = `
 
     <a class="foot-by rv" href="https://www.juicelabs.ai" target="_blank" rel="noopener">
       <img src="__LOGO_SRC__" alt="Juice AI logo">
-      <span class="t">Produced by <b>Juice AI</b> — AI-native ad creative &amp; brand intelligence<br><b>www.juicelabs.ai</b></span>
+      <span class="t">Produced by <b>Juice AI</b> — The Brand OS that generates content that outperforms<br><b>www.juicelabs.ai</b></span>
     </a>
 
     <div class="foot-note rv">
