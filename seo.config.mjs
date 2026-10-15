@@ -15,10 +15,10 @@ export const SITE_ORIGIN = "https://www.juicelabs.ai";
 /** Mirrors index.html. Routes without an override get these, and every route
  *  restores to these when its component unmounts. */
 export const SITE_META = {
-  title: "Juice AI",
+  title: "Creative Performance OS | Juice AI",
   description:
     "AI powered ads engineered from the anatomy of winning ads. Create Full Funnel Campaigns, Performance Ads, Creator Collabs, Social Campaigns & more.",
-  image: "/og-image.png",
+  image: "/thumbnail.png",
   type: "website",
 };
 
